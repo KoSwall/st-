@@ -2873,32 +2873,84 @@
           }
         }
 
-        // ========== 加载文件 ==========
+        // ========== 加载文件（分块解析） ==========
         function loadFile(file) {
           if (!file) return;
           setStatus(`📂 读取中: ${file.name} ...`, "");
           const reader = new FileReader();
           reader.onload = function (ev) {
             try {
-              const text = ev.target.result;
-              setStatus("⚙️ 正在分词 & 分页 ...", "");
-              allTokens = marked.lexer(text);
-              if (!allTokens.length) {
-                setStatus("⚠️ 文件为空或格式无效", "error");
-                return;
+              const fullText = ev.target.result;
+              setStatus("⚙️ 正在分词 & 分页 ... (分块处理中)", "");
+
+              // 分块大小：每块 300KB（可根据手机性能调整）
+              const CHUNK_SIZE = 300 * 1024; // 300KB
+              const totalLength = fullText.length;
+              let offset = 0;
+              let allTokens = [];
+              let chunkIndex = 0;
+
+              function processNextChunk() {
+                if (offset >= totalLength) {
+                  // 所有块处理完毕
+                  if (!allTokens.length) {
+                    setStatus("⚠️ 文件为空或格式无效", "error");
+                    return;
+                  }
+                  pages = buildPages(allTokens);
+                  searchMatches = [];
+                  searchIndex = -1;
+                  currentSearchQuery = "";
+                  searchResult.textContent = "";
+                  searchPrev.style.display = "none";
+                  searchNext.style.display = "none";
+                  renderPage(0);
+                  setStatus(
+                    `✅ 加载成功！共 ${allTokens.length} 个块，分 ${pages.length} 页`,
+                    "success",
+                  );
+                  return;
+                }
+
+                // 取当前块（尽量在换行处截断，避免截断 markdown 语法）
+                let end = Math.min(offset + CHUNK_SIZE, totalLength);
+                // 尝试向后延伸到下一个换行符，避免截断单词或语法
+                if (end < totalLength) {
+                  let newlineIndex = fullText.indexOf("\n", end);
+                  if (newlineIndex !== -1 && newlineIndex - end < 1000) {
+                    end = newlineIndex + 1; // 包括换行符
+                  }
+                }
+                const chunkText = fullText.substring(offset, end);
+                offset = end;
+                chunkIndex++;
+
+                // 解析当前块
+                let chunkTokens;
+                try {
+                  chunkTokens = marked.lexer(chunkText);
+                } catch (e) {
+                  setStatus(
+                    `❌ 解析第 ${chunkIndex} 块失败: ${e.message}`,
+                    "error",
+                  );
+                  return;
+                }
+                allTokens = allTokens.concat(chunkTokens);
+
+                // 更新进度
+                const progress = Math.min(
+                  100,
+                  Math.round((offset / totalLength) * 100),
+                );
+                setStatus(`⚙️ 解析中 ${progress}% (第 ${chunkIndex} 块)`, "");
+
+                // 用 setTimeout 让出主线程，避免 UI 卡死
+                setTimeout(processNextChunk, 50);
               }
-              pages = buildPages(allTokens);
-              searchMatches = [];
-              searchIndex = -1;
-              currentSearchQuery = "";
-              searchResult.textContent = "";
-              searchPrev.style.display = "none";
-              searchNext.style.display = "none";
-              renderPage(0);
-              setStatus(
-                `✅ 加载成功！共 ${allTokens.length} 个块，分 ${pages.length} 页`,
-                "success",
-              );
+
+              // 开始处理第一块
+              processNextChunk();
             } catch (err) {
               setStatus(`❌ 渲染失败: ${err.message}`, "error");
               console.error(err);
@@ -2907,10 +2959,6 @@
           reader.onerror = () => setStatus("❌ 文件读取失败", "error");
           reader.readAsText(file, "UTF-8");
         }
-
-        fileInput.addEventListener("change", function (e) {
-          if (e.target.files[0]) loadFile(e.target.files[0]);
-        });
 
         // ========== 翻页 ==========
         function goToPage(p) {
