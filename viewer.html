@@ -931,39 +931,56 @@
           if (!file) return;
           setStatus(`📂 读取中: ${file.name} ...`, "");
           const reader = new FileReader();
+
           reader.onload = function (ev) {
             try {
               const text = ev.target.result;
-              setStatus("⚙️ 正在分词 & 分页 ...", "");
-              allTokens = marked.lexer(text);
-              if (!allTokens.length) {
-                setStatus("⚠️ 文件为空或格式无效", "error");
-                return;
-              }
-              pages = buildPages(allTokens);
-              searchMatches = [];
-              searchIndex = -1;
-              currentSearchQuery = "";
-              searchResult.textContent = "";
-              searchPrev.style.display = "none";
-              searchNext.style.display = "none";
-              renderPage(0);
-              setStatus(
-                `✅ 加载成功！共 ${allTokens.length} 个块，分 ${pages.length} 页`,
-                "success",
-              );
+              // 1. 先告知用户文件已读入内存，更新 UI
+              setStatus("📖 文件读取完成，准备解析...", "");
+
+              // 2. 关键步骤：延迟 50ms 再执行解析，让浏览器有时间刷新状态条
+              setTimeout(() => {
+                try {
+                  setStatus("⚙️ 正在分词 & 分页 (手机处理中，请稍候)...", "");
+
+                  // 执行分词
+                  allTokens = marked.lexer(text);
+                  if (!allTokens.length) {
+                    setStatus("⚠️ 文件为空或格式无效", "error");
+                    return;
+                  }
+
+                  // 构建分页
+                  pages = buildPages(allTokens);
+                  searchMatches = [];
+                  searchIndex = -1;
+                  currentSearchQuery = "";
+                  searchResult.textContent = "";
+                  searchPrev.style.display = "none";
+                  searchNext.style.display = "none";
+
+                  renderPage(0);
+                  setStatus(
+                    `✅ 加载成功！共 ${allTokens.length} 个块，分 ${pages.length} 页`,
+                    "success",
+                  );
+                } catch (parseErr) {
+                  setStatus(`❌ 解析失败: ${parseErr.message}`, "error");
+                  console.error(parseErr);
+                }
+              }, 50); // 这里的 50 毫秒延迟至关重要
             } catch (err) {
-              setStatus(`❌ 渲染失败: ${err.message}`, "error");
+              setStatus(`❌ 读取失败: ${err.message}`, "error");
               console.error(err);
             }
           };
-          reader.onerror = () => setStatus("❌ 文件读取失败", "error");
+
+          reader.onerror = function () {
+            setStatus("❌ 文件读取失败，请检查文件是否损坏", "error");
+          };
+
           reader.readAsText(file, "UTF-8");
         }
-
-        fileInput.addEventListener("change", function (e) {
-          if (e.target.files[0]) loadFile(e.target.files[0]);
-        });
 
         // ========== 翻页 ==========
         function goToPage(p) {
