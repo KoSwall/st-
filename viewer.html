@@ -2327,7 +2327,7 @@
       /* ---------- 回到顶部 ---------- */
       #backToTop {
         position: fixed;
-        bottom: 30px;
+        bottom: 80px;
         right: 30px;
         background: #444;
         color: #eee;
@@ -2558,7 +2558,7 @@
     </div>
 
     <!-- 回到顶部 -->
-    <button id="backToTop" title="回到顶部">⬆ 回顶</button>
+    <button id="backToTop" title="回到顶部">⬆</button>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -2711,6 +2711,27 @@
           if (ignoreScrollHide) return;
           const currentScrollY = window.scrollY;
           const delta = currentScrollY - lastScrollY;
+
+          // 新增：控制回顶按钮
+          const backToTop = document.getElementById("backToTop");
+          // 只在滚动超过 200px 时才显示，避免页面顶部出现
+          if (currentScrollY > 200) {
+            if (delta > 0) {
+              // 向下滚动 → 隐藏
+              backToTop.style.opacity = "0";
+              backToTop.style.pointerEvents = "none";
+            } else if (delta < 0) {
+              // 向上滚动 → 显示
+              backToTop.style.opacity = "0.7";
+              backToTop.style.pointerEvents = "auto";
+            }
+          } else {
+            // 页面顶部时隐藏
+            backToTop.style.opacity = "0";
+            backToTop.style.pointerEvents = "none";
+          }
+
+          // 原有的工具栏显隐逻辑保持不变
           if (Math.abs(delta) > scrollThreshold) {
             if (delta > 0) hideToolbar();
             else showToolbar();
