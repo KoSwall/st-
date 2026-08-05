@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>酒馆聊天记录查看器 · 浮动工具栏</title>
+    <title>酒馆聊天记录查看器 · 浮动工具栏 + 底部分页</title>
     <script>
       /**
        * marked v11.1.0 - a markdown parser
@@ -1988,7 +1988,7 @@
       .container {
         max-width: 1000px;
         margin: 0 auto;
-        padding-top: 140px; /* 为三层工具栏留出空间 */
+        padding-top: 140px; /* 为浮动工具栏留出空间 */
       }
 
       /* ---------- 浮动工具栏 (fixed) ---------- */
@@ -1998,7 +1998,7 @@
         left: 0;
         right: 0;
         z-index: 9999;
-        background: #1e1e1e; /* 固定深色 */
+        background: #1e1e1e;
         border-bottom: 1px solid var(--border-color);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
         padding: 6px 16px 4px 16px;
@@ -2020,23 +2020,20 @@
         pointer-events: none;
       }
 
-      /* 行 */
       .tb-row {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 6px 14px;
         width: 100%;
-        margin-bottom: 8px; /* 行间距 */
+        margin-bottom: 8px;
       }
       .tb-row:last-child {
         margin-bottom: 0;
-        /* 状态条行 */
         justify-content: center;
         min-height: 28px;
       }
 
-      /* 控件样式 */
       #floatingToolbar label {
         display: flex;
         align-items: center;
@@ -2117,7 +2114,6 @@
         max-width: 140px;
       }
 
-      /* 搜索 */
       #floatingToolbar #searchResult {
         color: #aaa;
         font-size: 12px;
@@ -2146,7 +2142,6 @@
         color: #eee;
       }
 
-      /* 状态条 (第三行) */
       #floatingToolbar #statusBar {
         background: transparent;
         padding: 2px 12px;
@@ -2170,16 +2165,16 @@
         opacity: 1;
       }
 
-      /* ---------- 切换手柄（增强可见性） ---------- */
+      /* ---------- 切换手柄 ---------- */
       #toolbarToggle {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         z-index: 9998;
-        height: 10px; /* 稍微增高 */
+        height: 10px;
         cursor: pointer;
-        background: rgba(0, 0, 0, 0.15); /* 半透明背景，适应任何背景色 */
+        background: rgba(0, 0, 0, 0.15);
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         transition:
           background 0.2s,
@@ -2194,7 +2189,7 @@
       }
       #toolbarToggle::after {
         content: "⋮⋮⋮";
-        color: rgba(255, 255, 255, 0.7); /* 更亮 */
+        color: rgba(255, 255, 255, 0.7);
         font-size: 16px;
         letter-spacing: 3px;
         line-height: 10px;
@@ -2206,7 +2201,6 @@
       #toolbarToggle:hover::after {
         color: rgba(255, 255, 255, 0.95);
       }
-      /* 工具栏隐藏时，手柄更明显 */
       #floatingToolbar.hidden ~ #toolbarToggle {
         background: rgba(0, 0, 0, 0.3);
         border-bottom-color: rgba(255, 255, 255, 0.15);
@@ -2268,7 +2262,6 @@
         box-shadow: 0 0 0 1px #ffaa00;
       }
 
-      /* HTML卡片 iframe */
       .html-block-wrapper {
         margin: 16px 0;
         border-radius: 10px;
@@ -2285,7 +2278,53 @@
         transition: height 0.15s ease;
       }
 
-      /* 回到顶部 */
+      /* ---------- 底部分页条 ---------- */
+      .pagination-bar-bottom {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 16px;
+        background: #222;
+        padding: 8px 14px;
+        border-radius: 8px;
+        margin: 16px 0 8px 0;
+        border: 1px solid #333;
+        font-size: 13px;
+        color: #ddd;
+      }
+      .pagination-bar-bottom .info {
+        color: #ddd;
+      }
+      .pagination-bar-bottom input[type="number"] {
+        width: 55px;
+        background: #333;
+        color: #eee;
+        border: 1px solid #555;
+        border-radius: 4px;
+        padding: 3px 5px;
+      }
+      .pagination-bar-bottom button {
+        background: #444;
+        color: #eee;
+        border: none;
+        padding: 3px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .pagination-bar-bottom button:hover {
+        background: #666;
+      }
+      .pagination-bar-bottom button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .pagination-bar-bottom .total-blocks {
+        margin-left: auto;
+        color: #888;
+        font-size: 12px;
+      }
+
+      /* ---------- 回到顶部 ---------- */
       #backToTop {
         position: fixed;
         bottom: 30px;
@@ -2335,6 +2374,11 @@
           font-size: 14px;
           letter-spacing: 2px;
         }
+        .pagination-bar-bottom {
+          gap: 6px 12px;
+          font-size: 12px;
+          padding: 6px 10px;
+        }
       }
       @media (max-width: 600px) {
         .container {
@@ -2377,6 +2421,13 @@
         #toolbarToggle::after {
           font-size: 12px;
           letter-spacing: 1px;
+        }
+        .pagination-bar-bottom {
+          gap: 4px 8px;
+          font-size: 11px;
+        }
+        .pagination-bar-bottom input[type="number"] {
+          width: 45px;
         }
       }
       @media (max-width: 450px) {
@@ -2434,7 +2485,7 @@
         /></label>
       </div>
 
-      <!-- 第二行：翻页 + 跳转 + 搜索 -->
+      <!-- 第二行：翻页 + 跳转 + 搜索 + 每页 -->
       <div class="tb-row">
         <button id="prevPage" disabled>◀</button>
         <span class="tb-info" id="pageInfo">0 / 0</span>
@@ -2478,29 +2529,31 @@
         <button id="searchNext" style="display: none">▶</button>
       </div>
 
-      <!-- 第三行：状态消息（独立，不挤压） -->
+      <!-- 第三行：状态消息 -->
       <div class="tb-row">
         <div id="statusBar"></div>
       </div>
     </div>
 
-    <!-- 点击手柄（增强可见性） -->
+    <!-- 点击手柄 -->
     <div id="toolbarToggle" title="点击显示/隐藏工具栏"></div>
 
     <!-- ========== 内容区域 ========== -->
     <div class="container">
       <div id="content" class="markdown-body"></div>
-      <div
-        style="
-          margin-top: 20px;
-          padding: 10px 0;
-          border-top: 1px solid #333;
-          text-align: center;
-          color: #666;
-          font-size: 13px;
-        "
-      >
-        共 <span id="totalBlocks">0</span> 个块
+
+      <!-- ========== 底部分页条 ========== -->
+      <div class="pagination-bar-bottom" id="bottomPagination">
+        <button id="prevPageBottom" disabled>◀ 上一页</button>
+        <span class="info" id="pageInfoBottom">0 / 0</span>
+        <button id="nextPageBottom" disabled>下一页 ▶</button>
+        <label
+          >跳转 <input type="number" id="jumpPageBottom" min="1" value="1"
+        /></label>
+        <button id="jumpBtnBottom">跳转</button>
+        <span class="total-blocks"
+          >共 <span id="totalBlocks">0</span> 个块</span
+        >
       </div>
     </div>
 
@@ -2536,6 +2589,12 @@
         const searchNext = document.getElementById("searchNext");
         const searchClear = document.getElementById("searchClear");
         const totalBlocksSpan = document.getElementById("totalBlocks");
+        // 底部控件
+        const prevBtnB = document.getElementById("prevPageBottom");
+        const nextBtnB = document.getElementById("nextPageBottom");
+        const pageInfoB = document.getElementById("pageInfoBottom");
+        const jumpPageB = document.getElementById("jumpPageBottom");
+        const jumpBtnB = document.getElementById("jumpBtnBottom");
 
         // 样式控件
         const vars = {
@@ -2548,7 +2607,7 @@
           lineHeight: document.getElementById("lineHeight"),
         };
 
-        // ========== 样式应用（不改变工具栏背景） ==========
+        // ========== 样式应用 ==========
         function applyStyles() {
           document.documentElement.style.setProperty(
             "--bg-color",
@@ -2586,7 +2645,7 @@
         vars.lineHeight.addEventListener("change", applyStyles);
         applyStyles();
 
-        // ========== 状态消息（显示后自动消失） ==========
+        // ========== 状态消息 ==========
         function setStatus(msg, type) {
           if (statusTimer) {
             clearTimeout(statusTimer);
@@ -2597,7 +2656,6 @@
           if (type === "error") statusBar.classList.add("error");
           else if (type === "success") statusBar.classList.add("success");
           statusBar.classList.add("visible");
-
           statusTimer = setTimeout(() => {
             statusBar.classList.remove("visible");
             setTimeout(() => {
@@ -2608,7 +2666,7 @@
           }, 4000);
         }
 
-        // ========== 浮动工具栏 显隐控制 ==========
+        // ========== 浮动工具栏显隐 ==========
         const toolbar = document.getElementById("floatingToolbar");
         const toggleHandle = document.getElementById("toolbarToggle");
         let isToolbarVisible = true;
@@ -2631,18 +2689,12 @@
         }
 
         function toggleToolbar() {
-          if (isToolbarVisible) {
-            hideToolbar();
-          } else {
-            showToolbar();
-          }
+          isToolbarVisible ? hideToolbar() : showToolbar();
         }
-
         toggleHandle.addEventListener("click", function (e) {
           e.stopPropagation();
           toggleToolbar();
         });
-
         toolbar.addEventListener("click", function (e) {
           const tag = e.target.tagName.toLowerCase();
           if (
@@ -2650,9 +2702,8 @@
             tag === "input" ||
             tag === "select" ||
             tag === "label"
-          ) {
+          )
             return;
-          }
           toggleToolbar();
         });
 
@@ -2661,11 +2712,8 @@
           const currentScrollY = window.scrollY;
           const delta = currentScrollY - lastScrollY;
           if (Math.abs(delta) > scrollThreshold) {
-            if (delta > 0) {
-              hideToolbar();
-            } else {
-              showToolbar();
-            }
+            if (delta > 0) hideToolbar();
+            else showToolbar();
           }
           lastScrollY = currentScrollY;
         }
@@ -2677,7 +2725,6 @@
           },
           { passive: true },
         );
-
         showToolbar();
 
         // ========== 后处理：引号颜色 + 搜索高亮 ==========
@@ -2855,10 +2902,17 @@
               ? "无分页"
               : `${currentPage + 1} / ${total}`;
           pageInfo.textContent = infoText;
-          prevBtn.disabled = total <= 1 || currentPage === 0;
-          nextBtn.disabled = total <= 1 || currentPage === total - 1;
+          pageInfoB.textContent = infoText;
+          const disabledPrev = total <= 1 || currentPage === 0;
+          const disabledNext = total <= 1 || currentPage === total - 1;
+          prevBtn.disabled = disabledPrev;
+          nextBtn.disabled = disabledNext;
+          prevBtnB.disabled = disabledPrev;
+          nextBtnB.disabled = disabledNext;
           jumpPage.value = currentPage + 1;
           jumpPage.max = total;
+          jumpPageB.value = currentPage + 1;
+          jumpPageB.max = total;
           totalBlocksSpan.textContent = allTokens.length;
 
           if (searchMatches.length && searchIndex >= 0) {
@@ -2873,87 +2927,75 @@
           }
         }
 
-// ========== 加载文件（分块解析） ==========
-function loadFile(file) {
-    if (!file) return;
-    setStatus(`📂 读取中: ${file.name} ...`, "");
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-        try {
-            const fullText = ev.target.result;
-            setStatus("⚙️ 正在分词 & 分页 ... (分块处理中)", "");
+        // ========== 加载文件（分块解析） ==========
+        function loadFile(file) {
+          if (!file) return;
+          setStatus(`📂 读取中: ${file.name} ...`, "");
+          const reader = new FileReader();
+          reader.onload = function (ev) {
+            try {
+              const fullText = ev.target.result;
+              setStatus("⚙️ 正在分词 & 分页 ... (分块处理中)", "");
 
-            // 分块大小：每块 300KB（可根据手机性能调整）
-            const CHUNK_SIZE = 300 * 1024; // 300KB
-            const totalLength = fullText.length;
-            let offset = 0;
-            let allTokens = [];
-            let chunkIndex = 0;
+              const CHUNK_SIZE = 300 * 1024; // 300KB
+              const totalLength = fullText.length;
+              let offset = 0;
+              let allTokensAccum = [];
 
-            function processNextChunk() {
+              function processNextChunk() {
                 if (offset >= totalLength) {
-                    // 所有块处理完毕
-                    if (!allTokens.length) {
-                        setStatus("⚠️ 文件为空或格式无效", "error");
-                        return;
-                    }
-                    pages = buildPages(allTokens);
-                    searchMatches = [];
-                    searchIndex = -1;
-                    currentSearchQuery = "";
-                    searchResult.textContent = "";
-                    searchPrev.style.display = "none";
-                    searchNext.style.display = "none";
-                    renderPage(0);
-                    setStatus(
-                        `✅ 加载成功！共 ${allTokens.length} 个块，分 ${pages.length} 页`,
-                        "success"
-                    );
+                  if (!allTokensAccum.length) {
+                    setStatus("⚠️ 文件为空或格式无效", "error");
                     return;
+                  }
+                  allTokens = allTokensAccum;
+                  pages = buildPages(allTokens);
+                  searchMatches = [];
+                  searchIndex = -1;
+                  currentSearchQuery = "";
+                  searchResult.textContent = "";
+                  searchPrev.style.display = "none";
+                  searchNext.style.display = "none";
+                  renderPage(0);
+                  setStatus(
+                    `✅ 加载成功！共 ${allTokens.length} 个块，分 ${pages.length} 页`,
+                    "success",
+                  );
+                  return;
                 }
-
-                // 取当前块（尽量在换行处截断，避免截断 markdown 语法）
                 let end = Math.min(offset + CHUNK_SIZE, totalLength);
-                // 尝试向后延伸到下一个换行符，避免截断单词或语法
                 if (end < totalLength) {
-                    let newlineIndex = fullText.indexOf('\n', end);
-                    if (newlineIndex !== -1 && newlineIndex - end < 1000) {
-                        end = newlineIndex + 1; // 包括换行符
-                    }
+                  let newlineIndex = fullText.indexOf("\n", end);
+                  if (newlineIndex !== -1 && newlineIndex - end < 1000) {
+                    end = newlineIndex + 1;
+                  }
                 }
                 const chunkText = fullText.substring(offset, end);
                 offset = end;
-                chunkIndex++;
-
-                // 解析当前块
                 let chunkTokens;
                 try {
-                    chunkTokens = marked.lexer(chunkText);
+                  chunkTokens = marked.lexer(chunkText);
                 } catch (e) {
-                    setStatus(`❌ 解析第 ${chunkIndex} 块失败: ${e.message}`, "error");
-                    return;
+                  setStatus(`❌ 解析块失败: ${e.message}`, "error");
+                  return;
                 }
-                allTokens = allTokens.concat(chunkTokens);
-
-                // 更新进度
-                const progress = Math.min(100, Math.round((offset / totalLength) * 100));
-                setStatus(`⚙️ 解析中 ${progress}% (第 ${chunkIndex} 块)`, "");
-
-                // 用 setTimeout 让出主线程，避免 UI 卡死
+                allTokensAccum = allTokensAccum.concat(chunkTokens);
+                const progress = Math.min(
+                  100,
+                  Math.round((offset / totalLength) * 100),
+                );
+                setStatus(`⚙️ 解析中 ${progress}%`, "");
                 setTimeout(processNextChunk, 50);
+              }
+              processNextChunk();
+            } catch (err) {
+              setStatus(`❌ 渲染失败: ${err.message}`, "error");
+              console.error(err);
             }
-
-            // 开始处理第一块
-            processNextChunk();
-
-        } catch (err) {
-            setStatus(`❌ 渲染失败: ${err.message}`, "error");
-            console.error(err);
+          };
+          reader.onerror = () => setStatus("❌ 文件读取失败", "error");
+          reader.readAsText(file, "UTF-8");
         }
-    };
-    reader.onerror = () => setStatus("❌ 文件读取失败", "error");
-    reader.readAsText(file, "UTF-8");
-}
 
         fileInput.addEventListener("change", function (e) {
           if (e.target.files[0]) loadFile(e.target.files[0]);
@@ -2966,12 +3008,16 @@ function loadFile(file) {
           renderPage(p);
         }
 
-        prevBtn.addEventListener("click", () => {
-          if (currentPage > 0) goToPage(currentPage - 1);
-        });
-        nextBtn.addEventListener("click", () => {
-          if (currentPage < pages.length - 1) goToPage(currentPage + 1);
-        });
+        function bindPagination(btnPrev, btnNext) {
+          btnPrev.addEventListener("click", () => {
+            if (currentPage > 0) goToPage(currentPage - 1);
+          });
+          btnNext.addEventListener("click", () => {
+            if (currentPage < pages.length - 1) goToPage(currentPage + 1);
+          });
+        }
+        bindPagination(prevBtn, nextBtn);
+        bindPagination(prevBtnB, nextBtnB);
 
         function jumpHandler() {
           let p = parseInt(jumpPage.value);
@@ -2983,15 +3029,22 @@ function loadFile(file) {
         jumpPage.addEventListener("keydown", (e) => {
           if (e.key === "Enter") jumpHandler();
         });
+        jumpBtnB.addEventListener("click", jumpHandler);
+        jumpPageB.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") jumpHandler();
+        });
 
+        // ========== 每页数量切换（修复无反应问题） ==========
         pageSizeSelect.addEventListener("change", function () {
           const val = parseInt(this.value);
-          if (val === -1) pageSize = -1;
-          else pageSize = val;
-          if (allTokens.length) {
+          pageSize = val === -1 ? -1 : val;
+          if (allTokens && allTokens.length) {
             pages = buildPages(allTokens);
             currentPage = 0;
             renderPage(0);
+          } else {
+            // 若尚未加载文件，仅保存设置，待加载后生效
+            console.log("每页大小已设为", pageSize);
           }
         });
 
@@ -3030,20 +3083,14 @@ function loadFile(file) {
           searchIndex = -1;
           searchPrev.style.display = "none";
           searchNext.style.display = "none";
-
-          if (currentSearchQuery) {
-            searchClear.style.display = "inline-block";
-          } else {
-            searchClear.style.display = "none";
-          }
-
+          if (currentSearchQuery) searchClear.style.display = "inline-block";
+          else searchClear.style.display = "none";
           if (!currentSearchQuery || !pages.length) {
             searchResult.textContent = "";
             renderPage(currentPage);
             ignoreScrollHide = false;
             return;
           }
-
           ignoreScrollHide = true;
           showToolbar();
 
@@ -3092,18 +3139,14 @@ function loadFile(file) {
         );
         searchInput.addEventListener("keydown", (e) => {
           if (e.key === "Enter") performSearch(searchInput.value);
-          if (searchInput.value.length > 0) {
+          if (searchInput.value.length > 0)
             searchClear.style.display = "inline-block";
-          } else {
-            searchClear.style.display = "none";
-          }
+          else searchClear.style.display = "none";
         });
         searchInput.addEventListener("input", function () {
-          if (this.value.length > 0) {
-            searchClear.style.display = "inline-block";
-          } else {
-            searchClear.style.display = "none";
-          }
+          this.value.length > 0
+            ? (searchClear.style.display = "inline-block")
+            : (searchClear.style.display = "none");
         });
         searchNext.addEventListener("click", () => navigateSearch(1));
         searchPrev.addEventListener("click", () => navigateSearch(-1));
