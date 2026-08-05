@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>酒馆聊天记录查看器 · 浮动工具栏</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.0/marked.min.js"></script>
+    <style>
+      /* ---------- CSS 变量 ---------- */
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --quote-color: #ffaa88;
+        --italic-color: #d0b0ff;
+        --code-bg: #2d2d2d;
+        --font-size: 16px;
+        --line-height: 1.7;
+        --border-color: #444;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        padding: 0 15px 15px 15px;
+        margin: 0;
+        padding-top: 0;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-top: 140px; /* 为三层工具栏留出空间 */
+      }
+
+      /* ---------- 浮动工具栏 (fixed) ---------- */
+      #floatingToolbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        background: #1e1e1e; /* 固定深色 */
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+        padding: 6px 16px 4px 16px;
+        transition:
+          transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+          opacity 0.3s ease;
+        transform: translateY(0);
+        opacity: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 2px 14px;
+        font-size: 13px;
+        color: #ddd;
+      }
+      #floatingToolbar.hidden {
+        transform: translateY(-105%);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* 行 */
+      .tb-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 14px;
+        width: 100%;
+        margin-bottom: 8px; /* 行间距 */
+      }
+      .tb-row:last-child {
+        margin-bottom: 0;
+        /* 状态条行 */
+        justify-content: center;
+        min-height: 28px;
+      }
+
+      /* 控件样式 */
+      #floatingToolbar label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #ccc;
+        font-size: 12px;
+      }
+      #floatingToolbar input[type="color"] {
+        width: 22px;
+        height: 22px;
+        padding: 1px;
+        border: 1px solid #555;
+        border-radius: 3px;
+        background: transparent;
+        cursor: pointer;
+      }
+      #floatingToolbar input[type="number"],
+      #floatingToolbar input[type="text"],
+      #floatingToolbar select {
+        background: #333;
+        color: #eee;
+        border: 1px solid #555;
+        border-radius: 4px;
+        padding: 3px 5px;
+        font-size: 12px;
+      }
+      #floatingToolbar input[type="number"] {
+        width: 60px;
+      }
+      #floatingToolbar input[type="text"] {
+        width: 100px;
+      }
+      #floatingToolbar select {
+        width: auto;
+        padding: 3px 4px;
+      }
+      #floatingToolbar button {
+        background: #444;
+        color: #eee;
+        border: none;
+        padding: 3px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: 0.15s;
+        white-space: nowrap;
+      }
+      #floatingToolbar button:hover {
+        background: #666;
+      }
+      #floatingToolbar button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      #floatingToolbar .tb-sep {
+        color: #555;
+        font-size: 14px;
+        user-select: none;
+      }
+      #floatingToolbar .tb-info {
+        color: #aaa;
+        font-size: 12px;
+      }
+      #floatingToolbar .tb-file-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #floatingToolbar #fileInput {
+        background: #333;
+        color: #eee;
+        border: 1px solid #555;
+        padding: 3px 6px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        width: auto;
+        max-width: 140px;
+      }
+
+      /* 搜索 */
+      #floatingToolbar #searchResult {
+        color: #aaa;
+        font-size: 12px;
+        min-width: 60px;
+      }
+      #floatingToolbar #searchPrev,
+      #floatingToolbar #searchNext {
+        display: none;
+      }
+      .search-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+      .search-clear {
+        background: transparent;
+        border: none;
+        color: #888;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 0 2px;
+        line-height: 1;
+        display: none;
+      }
+      .search-clear:hover {
+        color: #eee;
+      }
+
+      /* 状态条 (第三行) */
+      #floatingToolbar #statusBar {
+        background: transparent;
+        padding: 2px 12px;
+        border-radius: 4px;
+        border-left: 3px solid #ffaa00;
+        font-size: 12px;
+        color: #ccc;
+        text-align: center;
+        transition: opacity 0.5s ease;
+        opacity: 0;
+      }
+      #floatingToolbar #statusBar.error {
+        border-left-color: #ff4444;
+        color: #ff8888;
+      }
+      #floatingToolbar #statusBar.success {
+        border-left-color: #44ff44;
+        color: #aaffaa;
+      }
+      #floatingToolbar #statusBar.visible {
+        opacity: 1;
+      }
+
+      /* ---------- 切换手柄（增强可见性） ---------- */
+      #toolbarToggle {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 9998;
+        height: 10px; /* 稍微增高 */
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.15); /* 半透明背景，适应任何背景色 */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        transition:
+          background 0.2s,
+          border-color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #toolbarToggle:hover {
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom-color: rgba(255, 255, 255, 0.2);
+      }
+      #toolbarToggle::after {
+        content: "⋮⋮⋮";
+        color: rgba(255, 255, 255, 0.7); /* 更亮 */
+        font-size: 16px;
+        letter-spacing: 3px;
+        line-height: 10px;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+        transition:
+          color 0.3s,
+          transform 0.3s;
+      }
+      #toolbarToggle:hover::after {
+        color: rgba(255, 255, 255, 0.95);
+      }
+      /* 工具栏隐藏时，手柄更明显 */
+      #floatingToolbar.hidden ~ #toolbarToggle {
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom-color: rgba(255, 255, 255, 0.15);
+      }
+      #floatingToolbar.hidden ~ #toolbarToggle::after {
+        color: rgba(255, 255, 255, 0.9);
+        transform: scale(1.1);
+      }
+      #floatingToolbar.hidden ~ #toolbarToggle:hover {
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      /* ---------- Markdown 内容样式 ---------- */
+      .markdown-body {
+        background: transparent;
+        font-size: var(--font-size);
+        line-height: var(--line-height);
+        color: var(--text-color);
+      }
+      .markdown-body h1,
+      .markdown-body h2 {
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 6px;
+      }
+      .markdown-body blockquote {
+        border-left: 4px solid #555;
+        padding-left: 16px;
+        margin-left: 0;
+        font-style: italic;
+      }
+      .markdown-body em,
+      .markdown-body i {
+        color: var(--italic-color);
+      }
+      .markdown-body pre {
+        background: var(--code-bg);
+        padding: 12px;
+        border-radius: 6px;
+        overflow-x: auto;
+        border: 1px solid #333;
+      }
+      .markdown-body code {
+        background: var(--code-bg);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      .markdown-body pre code {
+        background: transparent;
+        padding: 0;
+      }
+      .quote-text {
+        color: var(--quote-color) !important;
+      }
+      .search-highlight {
+        background: #ffff0055;
+        border-radius: 2px;
+        padding: 0 2px;
+        box-shadow: 0 0 0 1px #ffaa00;
+      }
+
+      /* HTML卡片 iframe */
+      .html-block-wrapper {
+        margin: 16px 0;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        background: #fff;
+      }
+      .html-block-wrapper iframe {
+        display: block;
+        width: 100%;
+        border: none;
+        background: #fff;
+        height: 200px;
+        transition: height 0.15s ease;
+      }
+
+      /* 回到顶部 */
+      #backToTop {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #444;
+        color: #eee;
+        border: none;
+        border-radius: 30px;
+        padding: 10px 16px;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        transition: 0.2s;
+        opacity: 0.7;
+      }
+      #backToTop:hover {
+        opacity: 1;
+        background: #666;
+      }
+
+      /* 响应式 */
+      @media (max-width: 820px) {
+        .container {
+          padding-top: 160px;
+        }
+        #floatingToolbar {
+          padding: 4px 12px 2px 12px;
+          gap: 0px 8px;
+          font-size: 12px;
+        }
+        .tb-row {
+          gap: 4px 8px;
+          margin-bottom: 2px;
+        }
+        #floatingToolbar input[type="text"] {
+          width: 70px;
+        }
+        #floatingToolbar #fileInput {
+          max-width: 100px;
+          font-size: 11px;
+        }
+        #toolbarToggle {
+          height: 8px;
+        }
+        #toolbarToggle::after {
+          font-size: 14px;
+          letter-spacing: 2px;
+        }
+      }
+      @media (max-width: 600px) {
+        .container {
+          padding-top: 180px;
+        }
+        #floatingToolbar {
+          padding: 4px 8px 2px 8px;
+          gap: 0px 6px;
+          font-size: 11px;
+        }
+        .tb-row {
+          gap: 3px 5px;
+          margin-bottom: 2px;
+        }
+        #floatingToolbar input[type="color"] {
+          width: 18px;
+          height: 18px;
+        }
+        #floatingToolbar input[type="number"] {
+          width: 48px;
+        }
+        #floatingToolbar input[type="text"] {
+          width: 55px;
+        }
+        #floatingToolbar button {
+          font-size: 11px;
+          padding: 2px 6px;
+        }
+        #floatingToolbar #fileInput {
+          max-width: 70px;
+          font-size: 10px;
+          padding: 2px 4px;
+        }
+        .tb-sep {
+          display: none;
+        }
+        #toolbarToggle {
+          height: 6px;
+        }
+        #toolbarToggle::after {
+          font-size: 12px;
+          letter-spacing: 1px;
+        }
+      }
+      @media (max-width: 450px) {
+        .container {
+          padding-top: 200px;
+        }
+        #floatingToolbar label {
+          font-size: 10px;
+        }
+        #floatingToolbar input[type="text"] {
+          width: 45px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ========== 浮动工具栏 (fixed) ========== -->
+    <div id="floatingToolbar">
+      <!-- 第一行：文件 + 颜色 + 字号行高 -->
+      <div class="tb-row">
+        <div class="tb-file-wrap">
+          <input type="file" id="fileInput" accept=".txt,.md" />
+        </div>
+        <label>背景 <input type="color" id="bgColor" value="#1a1a1a" /></label>
+        <label
+          >字体 <input type="color" id="textColor" value="#e0e0e0"
+        /></label>
+        <label
+          >引号 <input type="color" id="quoteColor" value="#ffaa88"
+        /></label>
+        <label
+          >斜体 <input type="color" id="italicColor" value="#d0b0ff"
+        /></label>
+        <label>代码块 <input type="color" id="codeBg" value="#2d2d2d" /></label>
+        <label
+          >字号
+          <input
+            type="number"
+            id="fontSize"
+            value="16"
+            min="12"
+            max="28"
+            style="width: 48px"
+        /></label>
+        <label
+          >行高
+          <input
+            type="number"
+            id="lineHeight"
+            value="1.7"
+            step="0.1"
+            min="1.0"
+            max="3.0"
+            style="width: 48px"
+        /></label>
+      </div>
+
+      <!-- 第二行：翻页 + 跳转 + 搜索 -->
+      <div class="tb-row">
+        <button id="prevPage" disabled>◀</button>
+        <span class="tb-info" id="pageInfo">0 / 0</span>
+        <button id="nextPage" disabled>▶</button>
+        <label
+          >跳转
+          <input
+            type="number"
+            id="jumpPage"
+            min="1"
+            value="1"
+            style="width: 60px"
+        /></label>
+        <button id="jumpBtn">跳转</button>
+        <label
+          >每页
+          <select id="pageSizeSelect">
+            <option value="50">50</option>
+            <option value="200" selected>200</option>
+            <option value="500">500</option>
+            <option value="1000">1000</option>
+            <option value="5000">5000</option>
+            <option value="-1">无</option>
+          </select></label
+        >
+        <span class="tb-sep">|</span>
+        <div class="search-wrapper">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="搜索..."
+            style="width: 90px"
+          />
+          <button class="search-clear" id="searchClear" title="清空搜索">
+            ✕
+          </button>
+        </div>
+        <button id="searchBtn">查找</button>
+        <span id="searchResult"></span>
+        <button id="searchPrev" style="display: none">◀</button>
+        <button id="searchNext" style="display: none">▶</button>
+      </div>
+
+      <!-- 第三行：状态消息（独立，不挤压） -->
+      <div class="tb-row">
+        <div id="statusBar"></div>
+      </div>
+    </div>
+
+    <!-- 点击手柄（增强可见性） -->
+    <div id="toolbarToggle" title="点击显示/隐藏工具栏"></div>
+
+    <!-- ========== 内容区域 ========== -->
+    <div class="container">
+      <div id="content" class="markdown-body"></div>
+      <div
+        style="
+          margin-top: 20px;
+          padding: 10px 0;
+          border-top: 1px solid #333;
+          text-align: center;
+          color: #666;
+          font-size: 13px;
+        "
+      >
+        共 <span id="totalBlocks">0</span> 个块
+      </div>
+    </div>
+
+    <!-- 回到顶部 -->
+    <button id="backToTop" title="回到顶部">⬆ 回顶</button>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // ========== 核心状态 ==========
+        let allTokens = [];
+        let pages = [];
+        let currentPage = 0;
+        let pageSize = 200;
+        let searchMatches = [];
+        let searchIndex = -1;
+        let currentSearchQuery = "";
+        let statusTimer = null;
+
+        // DOM 引用
+        const fileInput = document.getElementById("fileInput");
+        const statusBar = document.getElementById("statusBar");
+        const contentDiv = document.getElementById("content");
+        const prevBtn = document.getElementById("prevPage");
+        const nextBtn = document.getElementById("nextPage");
+        const pageInfo = document.getElementById("pageInfo");
+        const jumpPage = document.getElementById("jumpPage");
+        const jumpBtn = document.getElementById("jumpBtn");
+        const pageSizeSelect = document.getElementById("pageSizeSelect");
+        const searchInput = document.getElementById("searchInput");
+        const searchBtn = document.getElementById("searchBtn");
+        const searchResult = document.getElementById("searchResult");
+        const searchPrev = document.getElementById("searchPrev");
+        const searchNext = document.getElementById("searchNext");
+        const searchClear = document.getElementById("searchClear");
+        const totalBlocksSpan = document.getElementById("totalBlocks");
+
+        // 样式控件
+        const vars = {
+          bg: document.getElementById("bgColor"),
+          text: document.getElementById("textColor"),
+          quote: document.getElementById("quoteColor"),
+          italic: document.getElementById("italicColor"),
+          codeBg: document.getElementById("codeBg"),
+          fontSize: document.getElementById("fontSize"),
+          lineHeight: document.getElementById("lineHeight"),
+        };
+
+        // ========== 样式应用（不改变工具栏背景） ==========
+        function applyStyles() {
+          document.documentElement.style.setProperty(
+            "--bg-color",
+            vars.bg.value,
+          );
+          document.documentElement.style.setProperty(
+            "--text-color",
+            vars.text.value,
+          );
+          document.documentElement.style.setProperty(
+            "--quote-color",
+            vars.quote.value,
+          );
+          document.documentElement.style.setProperty(
+            "--italic-color",
+            vars.italic.value,
+          );
+          document.documentElement.style.setProperty(
+            "--code-bg",
+            vars.codeBg.value,
+          );
+          document.documentElement.style.setProperty(
+            "--font-size",
+            vars.fontSize.value + "px",
+          );
+          document.documentElement.style.setProperty(
+            "--line-height",
+            vars.lineHeight.value,
+          );
+        }
+        Object.values(vars).forEach((el) =>
+          el.addEventListener("input", applyStyles),
+        );
+        vars.fontSize.addEventListener("change", applyStyles);
+        vars.lineHeight.addEventListener("change", applyStyles);
+        applyStyles();
+
+        // ========== 状态消息（显示后自动消失） ==========
+        function setStatus(msg, type) {
+          if (statusTimer) {
+            clearTimeout(statusTimer);
+            statusTimer = null;
+          }
+          statusBar.textContent = msg;
+          statusBar.className = "";
+          if (type === "error") statusBar.classList.add("error");
+          else if (type === "success") statusBar.classList.add("success");
+          statusBar.classList.add("visible");
+
+          statusTimer = setTimeout(() => {
+            statusBar.classList.remove("visible");
+            setTimeout(() => {
+              statusBar.textContent = "";
+              statusBar.className = "";
+            }, 500);
+            statusTimer = null;
+          }, 4000);
+        }
+
+        // ========== 浮动工具栏 显隐控制 ==========
+        const toolbar = document.getElementById("floatingToolbar");
+        const toggleHandle = document.getElementById("toolbarToggle");
+        let isToolbarVisible = true;
+        let lastScrollY = window.scrollY;
+        let scrollThreshold = 20;
+        let scrollTimer = null;
+        let ignoreScrollHide = false;
+
+        function showToolbar() {
+          if (isToolbarVisible) return;
+          isToolbarVisible = true;
+          toolbar.classList.remove("hidden");
+        }
+
+        function hideToolbar() {
+          if (!isToolbarVisible) return;
+          if (ignoreScrollHide) return;
+          isToolbarVisible = false;
+          toolbar.classList.add("hidden");
+        }
+
+        function toggleToolbar() {
+          if (isToolbarVisible) {
+            hideToolbar();
+          } else {
+            showToolbar();
+          }
+        }
+
+        toggleHandle.addEventListener("click", function (e) {
+          e.stopPropagation();
+          toggleToolbar();
+        });
+
+        toolbar.addEventListener("click", function (e) {
+          const tag = e.target.tagName.toLowerCase();
+          if (
+            tag === "button" ||
+            tag === "input" ||
+            tag === "select" ||
+            tag === "label"
+          ) {
+            return;
+          }
+          toggleToolbar();
+        });
+
+        function handleScroll() {
+          if (ignoreScrollHide) return;
+          const currentScrollY = window.scrollY;
+          const delta = currentScrollY - lastScrollY;
+          if (Math.abs(delta) > scrollThreshold) {
+            if (delta > 0) {
+              hideToolbar();
+            } else {
+              showToolbar();
+            }
+          }
+          lastScrollY = currentScrollY;
+        }
+        window.addEventListener(
+          "scroll",
+          function () {
+            if (scrollTimer) cancelAnimationFrame(scrollTimer);
+            scrollTimer = requestAnimationFrame(handleScroll);
+          },
+          { passive: true },
+        );
+
+        showToolbar();
+
+        // ========== 后处理：引号颜色 + 搜索高亮 ==========
+        function postProcessTextNodes(root, highlightQuery) {
+          const walker = document.createTreeWalker(
+            root,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false,
+          );
+          const textNodes = [];
+          let node;
+          while ((node = walker.nextNode())) {
+            textNodes.push(node);
+          }
+          for (const textNode of textNodes) {
+            let text = textNode.textContent;
+            if (!text.trim()) continue;
+
+            let parts = [];
+            let lastIndex = 0;
+            const regex = /“([^”]*)”|"([^"]*)"/g;
+            let match;
+            let hasQuote = false;
+            while ((match = regex.exec(text)) !== null) {
+              hasQuote = true;
+              const content = match[1] || match[2] || "";
+              const fullMatch = match[0];
+              const startIndex = match.index;
+              const endIndex = startIndex + fullMatch.length;
+              if (startIndex > lastIndex) {
+                parts.push({
+                  type: "text",
+                  content: text.substring(lastIndex, startIndex),
+                });
+              }
+              parts.push({ type: "quote", content: content, full: fullMatch });
+              lastIndex = endIndex;
+            }
+            if (!hasQuote) {
+              if (highlightQuery && highlightQuery.trim()) {
+                const q = highlightQuery.trim();
+                const regexQ = new RegExp(
+                  "(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")",
+                  "gi",
+                );
+                const newText = text.replace(
+                  regexQ,
+                  '<mark class="search-highlight">$1</mark>',
+                );
+                if (newText !== text) {
+                  const span = document.createElement("span");
+                  span.innerHTML = newText;
+                  textNode.parentNode.replaceChild(span, textNode);
+                }
+              }
+              continue;
+            }
+            if (lastIndex < text.length) {
+              parts.push({ type: "text", content: text.substring(lastIndex) });
+            }
+            const fragment = document.createDocumentFragment();
+            for (const part of parts) {
+              if (part.type === "text") {
+                let content = part.content;
+                if (highlightQuery && highlightQuery.trim()) {
+                  const q = highlightQuery.trim();
+                  const regexQ = new RegExp(
+                    "(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")",
+                    "gi",
+                  );
+                  content = content.replace(
+                    regexQ,
+                    '<mark class="search-highlight">$1</mark>',
+                  );
+                }
+                if (content) {
+                  const span = document.createElement("span");
+                  span.innerHTML = content;
+                  fragment.appendChild(span);
+                }
+              } else if (part.type === "quote") {
+                let content = part.content;
+                if (highlightQuery && highlightQuery.trim()) {
+                  const q = highlightQuery.trim();
+                  const regexQ = new RegExp(
+                    "(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")",
+                    "gi",
+                  );
+                  content = content.replace(
+                    regexQ,
+                    '<mark class="search-highlight">$1</mark>',
+                  );
+                }
+                const quoteChar = part.full.charAt(0);
+                const endChar = part.full.charAt(part.full.length - 1);
+                const span = document.createElement("span");
+                span.className = "quote-text";
+                span.innerHTML = quoteChar + content + endChar;
+                fragment.appendChild(span);
+              }
+            }
+            textNode.parentNode.replaceChild(fragment, textNode);
+          }
+        }
+
+        // ========== Markdown 渲染器 ==========
+        function getRenderer() {
+          const renderer = new marked.Renderer();
+          renderer.code = function (code, lang) {
+            if (lang === "html") {
+              const encoded = encodeURIComponent(code)
+                .replace(/'/g, "%27")
+                .replace(/"/g, "%22");
+              return `<div class="html-block-wrapper">
+                                    <iframe src="data:text/html;charset=utf-8,${encoded}" 
+                                            sandbox="allow-scripts allow-same-origin allow-modals"
+                                            style="width:100%; border:none; background:#fff; height:200px;"
+                                            onload="(function(el){
+                                                function resize() {
+                                                    try {
+                                                        var doc = el.contentWindow.document;
+                                                        var h = doc.documentElement.scrollHeight || doc.body.scrollHeight || 200;
+                                                        if (h > 50) el.style.height = (h + 20) + 'px';
+                                                    } catch(e) { el.style.height = '800px'; }
+                                                }
+                                                resize();
+                                                setTimeout(resize, 500);
+                                                setTimeout(resize, 1500);
+                                            })(this)">
+                                    </iframe>
+                                </div>`;
+            }
+            const safe = code
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;");
+            return `<pre><code class="language-${lang || "text"}">${safe}</code></pre>`;
+          };
+          return renderer;
+        }
+
+        // ========== 分页 ==========
+        function buildPages(tokens) {
+          if (pageSize === -1) return [tokens];
+          const size = pageSize;
+          const newPages = [];
+          for (let i = 0; i < tokens.length; i += size) {
+            newPages.push(tokens.slice(i, i + size));
+          }
+          return newPages;
+        }
+
+        // ========== 渲染页面 ==========
+        function renderPage(index) {
+          if (!pages.length) {
+            contentDiv.innerHTML =
+              '<p style="color:#666;padding:20px;">暂无内容，请先加载文件。</p>';
+            return;
+          }
+          if (index < 0) index = 0;
+          if (index >= pages.length) index = pages.length - 1;
+          currentPage = index;
+
+          const pageTokens = pages[currentPage];
+          const renderer = getRenderer();
+          let html = marked.parser(pageTokens, { renderer: renderer });
+          contentDiv.innerHTML = html;
+
+          postProcessTextNodes(contentDiv, currentSearchQuery);
+
+          const total = pages.length;
+          const infoText =
+            total === 1 && pageSize === -1
+              ? "无分页"
+              : `${currentPage + 1} / ${total}`;
+          pageInfo.textContent = infoText;
+          prevBtn.disabled = total <= 1 || currentPage === 0;
+          nextBtn.disabled = total <= 1 || currentPage === total - 1;
+          jumpPage.value = currentPage + 1;
+          jumpPage.max = total;
+          totalBlocksSpan.textContent = allTokens.length;
+
+          if (searchMatches.length && searchIndex >= 0) {
+            setTimeout(() => {
+              const firstMark = contentDiv.querySelector(".search-highlight");
+              if (firstMark)
+                firstMark.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
+            }, 100);
+          }
+        }
+
+        // ========== 加载文件 ==========
+        function loadFile(file) {
+          if (!file) return;
+          setStatus(`📂 读取中: ${file.name} ...`, "");
+          const reader = new FileReader();
+          reader.onload = function (ev) {
+            try {
+              const text = ev.target.result;
+              setStatus("⚙️ 正在分词 & 分页 ...", "");
+              allTokens = marked.lexer(text);
+              if (!allTokens.length) {
+                setStatus("⚠️ 文件为空或格式无效", "error");
+                return;
+              }
+              pages = buildPages(allTokens);
+              searchMatches = [];
+              searchIndex = -1;
+              currentSearchQuery = "";
+              searchResult.textContent = "";
+              searchPrev.style.display = "none";
+              searchNext.style.display = "none";
+              renderPage(0);
+              setStatus(
+                `✅ 加载成功！共 ${allTokens.length} 个块，分 ${pages.length} 页`,
+                "success",
+              );
+            } catch (err) {
+              setStatus(`❌ 渲染失败: ${err.message}`, "error");
+              console.error(err);
+            }
+          };
+          reader.onerror = () => setStatus("❌ 文件读取失败", "error");
+          reader.readAsText(file, "UTF-8");
+        }
+
+        fileInput.addEventListener("change", function (e) {
+          if (e.target.files[0]) loadFile(e.target.files[0]);
+        });
+
+        // ========== 翻页 ==========
+        function goToPage(p) {
+          if (p < 0) p = 0;
+          if (p >= pages.length) p = pages.length - 1;
+          renderPage(p);
+        }
+
+        prevBtn.addEventListener("click", () => {
+          if (currentPage > 0) goToPage(currentPage - 1);
+        });
+        nextBtn.addEventListener("click", () => {
+          if (currentPage < pages.length - 1) goToPage(currentPage + 1);
+        });
+
+        function jumpHandler() {
+          let p = parseInt(jumpPage.value);
+          if (isNaN(p)) return;
+          p = Math.max(1, Math.min(p, pages.length));
+          goToPage(p - 1);
+        }
+        jumpBtn.addEventListener("click", jumpHandler);
+        jumpPage.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") jumpHandler();
+        });
+
+        pageSizeSelect.addEventListener("change", function () {
+          const val = parseInt(this.value);
+          if (val === -1) pageSize = -1;
+          else pageSize = val;
+          if (allTokens.length) {
+            pages = buildPages(allTokens);
+            currentPage = 0;
+            renderPage(0);
+          }
+        });
+
+        // ========== 搜索 ==========
+        function extractText(tokens) {
+          let text = "";
+          for (const t of tokens) {
+            if (t.text) text += t.text + " ";
+            if (t.tokens) text += extractText(t.tokens) + " ";
+            if (t.type === "heading" && t.text) text += t.text + " ";
+            if (t.type === "list" && t.items) {
+              for (const item of t.items) {
+                text += extractText(item.tokens || []) + " ";
+              }
+            }
+          }
+          return text.trim();
+        }
+
+        function clearSearch() {
+          searchInput.value = "";
+          currentSearchQuery = "";
+          searchMatches = [];
+          searchIndex = -1;
+          searchResult.textContent = "";
+          searchPrev.style.display = "none";
+          searchNext.style.display = "none";
+          searchClear.style.display = "none";
+          renderPage(currentPage);
+          ignoreScrollHide = false;
+        }
+
+        function performSearch(query) {
+          currentSearchQuery = query.trim();
+          searchMatches = [];
+          searchIndex = -1;
+          searchPrev.style.display = "none";
+          searchNext.style.display = "none";
+
+          if (currentSearchQuery) {
+            searchClear.style.display = "inline-block";
+          } else {
+            searchClear.style.display = "none";
+          }
+
+          if (!currentSearchQuery || !pages.length) {
+            searchResult.textContent = "";
+            renderPage(currentPage);
+            ignoreScrollHide = false;
+            return;
+          }
+
+          ignoreScrollHide = true;
+          showToolbar();
+
+          const q = currentSearchQuery.toLowerCase();
+          for (let i = 0; i < pages.length; i++) {
+            const pageText = extractText(pages[i]).toLowerCase();
+            if (pageText.includes(q)) {
+              searchMatches.push(i);
+            }
+          }
+          if (searchMatches.length === 0) {
+            searchResult.textContent = "未找到匹配";
+            renderPage(currentPage);
+            setTimeout(() => {
+              ignoreScrollHide = false;
+            }, 3000);
+            return;
+          }
+          searchResult.textContent = `找到 ${searchMatches.length} 页`;
+          searchPrev.style.display = "inline-block";
+          searchNext.style.display = "inline-block";
+          searchIndex = 0;
+          renderPage(searchMatches[searchIndex]);
+          searchResult.textContent = `找到 ${searchMatches.length} 页 (${searchIndex + 1}/${searchMatches.length})`;
+          setTimeout(() => {
+            ignoreScrollHide = false;
+          }, 2000);
+        }
+
+        function navigateSearch(delta) {
+          if (!searchMatches.length) return;
+          ignoreScrollHide = true;
+          showToolbar();
+          searchIndex =
+            (searchIndex + delta + searchMatches.length) % searchMatches.length;
+          renderPage(searchMatches[searchIndex]);
+          searchResult.textContent = `找到 ${searchMatches.length} 页 (${searchIndex + 1}/${searchMatches.length})`;
+          if (window.navigateTimer) clearTimeout(window.navigateTimer);
+          window.navigateTimer = setTimeout(() => {
+            ignoreScrollHide = false;
+          }, 1500);
+        }
+
+        searchBtn.addEventListener("click", () =>
+          performSearch(searchInput.value),
+        );
+        searchInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") performSearch(searchInput.value);
+          if (searchInput.value.length > 0) {
+            searchClear.style.display = "inline-block";
+          } else {
+            searchClear.style.display = "none";
+          }
+        });
+        searchInput.addEventListener("input", function () {
+          if (this.value.length > 0) {
+            searchClear.style.display = "inline-block";
+          } else {
+            searchClear.style.display = "none";
+          }
+        });
+        searchNext.addEventListener("click", () => navigateSearch(1));
+        searchPrev.addEventListener("click", () => navigateSearch(-1));
+        searchClear.addEventListener("click", function () {
+          clearSearch();
+          searchInput.value = "";
+          this.style.display = "none";
+          ignoreScrollHide = false;
+        });
+
+        // ========== 回到顶部 ==========
+        document.getElementById("backToTop").addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        // ========== 拖拽支持 ==========
+        document.body.addEventListener("dragover", (e) => {
+          e.preventDefault();
+        });
+        document.body.addEventListener("drop", (e) => {
+          e.preventDefault();
+          const files = e.dataTransfer.files;
+          if (
+            files.length &&
+            (files[0].name.endsWith(".txt") || files[0].name.endsWith(".md"))
+          ) {
+            loadFile(files[0]);
+            const dt = new DataTransfer();
+            dt.items.add(files[0]);
+            fileInput.files = dt.files;
+          } else {
+            setStatus("⚠️ 请拖入 .txt 或 .md 文件", "error");
+          }
+        });
+
+        contentDiv.innerHTML =
+          '<p style="color:#666;padding:20px;">📂 点击「选择文件」或直接拖入 .txt/.md 聊天记录</p>';
+      });
+    </script>
+  </body>
+</html>
