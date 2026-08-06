@@ -2,8 +2,11 @@
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>酒馆聊天记录查看器 · 浮动工具栏 + 底部分页</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>酒馆聊天记录查看器 · 完整功能版</title>
     <script>
       /**
        * marked v11.1.0 - a markdown parser
@@ -1446,7 +1449,10 @@
                     for (let t = 0; t < n.length; t++)
                       s += this.renderer.tablecell(
                         this.parseInline(n[t].tokens),
-                        { header: !1, align: e.align[t] },
+                        {
+                          header: !1,
+                          align: e.align[t],
+                        },
                       );
                     i += this.renderer.tablerow(s);
                   }
@@ -1963,8 +1969,9 @@
         --font-size: 16px;
         --line-height: 1.7;
         --border-color: #444;
+        --user-bg: #2d4a3e;
+        --char-bg: #3d2a4a;
       }
-
       * {
         box-sizing: border-box;
       }
@@ -1978,7 +1985,7 @@
           system-ui,
           -apple-system,
           sans-serif;
-        padding: 0 15px 15px 15px;
+        padding: 0 12px 15px 12px;
         margin: 0;
         padding-top: 0;
         transition:
@@ -1988,10 +1995,11 @@
       .container {
         max-width: 1000px;
         margin: 0 auto;
-        padding-top: 140px; /* 为浮动工具栏留出空间 */
+        padding-top: 120px;
+        padding-bottom: 80px;
       }
 
-      /* ---------- 浮动工具栏 (fixed) ---------- */
+      /* ---------- 浮动工具栏 ---------- */
       #floatingToolbar {
         position: fixed;
         top: 0;
@@ -2001,16 +2009,15 @@
         background: #1e1e1e;
         border-bottom: 1px solid var(--border-color);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
-        padding: 6px 16px 4px 16px;
+        padding: 4px 12px 4px 12px;
         transition:
           transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
           opacity 0.3s ease;
         transform: translateY(0);
         opacity: 1;
         display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        gap: 2px 14px;
+        flex-direction: column;
+        gap: 4px;
         font-size: 13px;
         color: #ddd;
       }
@@ -2019,36 +2026,23 @@
         opacity: 0;
         pointer-events: none;
       }
-
       .tb-row {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 6px 14px;
+        gap: 4px 10px;
         width: 100%;
-        margin-bottom: 8px;
       }
       .tb-row:last-child {
-        margin-bottom: 0;
-        justify-content: center;
-        min-height: 28px;
+        justify-content: space-between;
       }
-
       #floatingToolbar label {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
         color: #ccc;
         font-size: 12px;
-      }
-      #floatingToolbar input[type="color"] {
-        width: 22px;
-        height: 22px;
-        padding: 1px;
-        border: 1px solid #555;
-        border-radius: 3px;
-        background: transparent;
-        cursor: pointer;
+        white-space: nowrap;
       }
       #floatingToolbar input[type="number"],
       #floatingToolbar input[type="text"],
@@ -2057,29 +2051,34 @@
         color: #eee;
         border: 1px solid #555;
         border-radius: 4px;
-        padding: 3px 5px;
+        padding: 2px 5px;
         font-size: 12px;
+        height: 28px;
       }
       #floatingToolbar input[type="number"] {
-        width: 60px;
+        width: 64px;
       }
       #floatingToolbar input[type="text"] {
-        width: 100px;
+        width: 90px;
       }
       #floatingToolbar select {
         width: auto;
-        padding: 3px 4px;
+        padding: 2px 4px;
       }
       #floatingToolbar button {
         background: #444;
         color: #eee;
         border: none;
-        padding: 3px 10px;
+        padding: 2px 10px;
         border-radius: 4px;
         cursor: pointer;
         font-size: 12px;
         transition: 0.15s;
         white-space: nowrap;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
       #floatingToolbar button:hover {
         background: #666;
@@ -2096,55 +2095,11 @@
       #floatingToolbar .tb-info {
         color: #aaa;
         font-size: 12px;
+        white-space: nowrap;
       }
-      #floatingToolbar .tb-file-wrap {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      #floatingToolbar #fileInput {
-        background: #333;
-        color: #eee;
-        border: 1px solid #555;
-        padding: 3px 6px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 12px;
-        width: auto;
-        max-width: 140px;
-      }
-
-      #floatingToolbar #searchResult {
-        color: #aaa;
-        font-size: 12px;
-        min-width: 60px;
-      }
-      #floatingToolbar #searchPrev,
-      #floatingToolbar #searchNext {
-        display: none;
-      }
-      .search-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-      }
-      .search-clear {
-        background: transparent;
-        border: none;
-        color: #888;
-        font-size: 16px;
-        cursor: pointer;
-        padding: 0 2px;
-        line-height: 1;
-        display: none;
-      }
-      .search-clear:hover {
-        color: #eee;
-      }
-
       #floatingToolbar #statusBar {
         background: transparent;
-        padding: 2px 12px;
+        padding: 2px 10px;
         border-radius: 4px;
         border-left: 3px solid #ffaa00;
         font-size: 12px;
@@ -2152,6 +2107,8 @@
         text-align: center;
         transition: opacity 0.5s ease;
         opacity: 0;
+        flex: 1;
+        min-width: 60px;
       }
       #floatingToolbar #statusBar.error {
         border-left-color: #ff4444;
@@ -2163,6 +2120,37 @@
       }
       #floatingToolbar #statusBar.visible {
         opacity: 1;
+      }
+      .search-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        flex-wrap: wrap;
+      }
+      .search-clear {
+        background: transparent !important;
+        border: none !important;
+        color: #888 !important;
+        font-size: 16px !important;
+        cursor: pointer;
+        padding: 0 2px !important;
+        line-height: 1;
+        display: none;
+        height: auto !important;
+        min-width: 20px;
+      }
+      .search-clear:hover {
+        color: #eee !important;
+        background: transparent !important;
+      }
+      #searchResult {
+        color: #aaa;
+        font-size: 11px;
+        min-width: 40px;
+      }
+      #searchPrev,
+      #searchNext {
+        display: none;
       }
 
       /* ---------- 切换手柄 ---------- */
@@ -2213,6 +2201,333 @@
         background: rgba(0, 0, 0, 0.5);
       }
 
+      /* ---------- 侧栏 ---------- */
+      #sidebar {
+        position: fixed;
+        top: 0;
+        left: -380px;
+        width: 380px;
+        max-width: 92vw;
+        height: 100vh;
+        background: #1e1e1e;
+        border-right: 1px solid var(--border-color);
+        z-index: 10000;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 16px;
+        overflow-y: auto;
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
+      }
+      #sidebar.open {
+        left: 0;
+      }
+      #sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: none;
+      }
+      #sidebar-overlay.open {
+        display: block;
+      }
+
+      /* ---------- 设置面板 ---------- */
+      #settingsPanel {
+        position: fixed;
+        top: 0;
+        right: -440px;
+        width: 440px;
+        max-width: 96vw;
+        height: 100vh;
+        background: #1e1e1e;
+        border-left: 1px solid var(--border-color);
+        z-index: 10000;
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 16px;
+        overflow-y: auto;
+        box-shadow: -2px 0 20px rgba(0, 0, 0, 0.5);
+      }
+      #settingsPanel.open {
+        right: 0;
+      }
+      #settings-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: none;
+      }
+      #settings-overlay.open {
+        display: block;
+      }
+
+      /* ---------- 侧栏/面板通用样式 ---------- */
+      .panel-section {
+        margin-bottom: 20px;
+      }
+      .panel-section h3 {
+        color: #e94560;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 6px;
+      }
+      .upload-zone {
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .upload-zone:hover,
+      .upload-zone.dragover {
+        border-color: #e94560;
+        background: rgba(233, 69, 96, 0.1);
+      }
+      .upload-zone input {
+        display: none;
+      }
+      .upload-zone .icon {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+      }
+      .upload-zone .text {
+        font-size: 0.85rem;
+        color: var(--text-secondary, #aaa);
+      }
+      .chat-list,
+      .bookmark-list {
+        list-style: none;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 0;
+        margin: 0;
+      }
+      .chat-list li,
+      .bookmark-list li {
+        padding: 10px;
+        background: #2a2a2a;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .chat-list li:hover,
+      .bookmark-list li:hover {
+        background: rgba(233, 69, 96, 0.3);
+      }
+      .chat-list li.active {
+        border-left: 3px solid #e94560;
+      }
+      .chat-info,
+      .bookmark-info {
+        flex: 1;
+        overflow: hidden;
+      }
+      .chat-name,
+      .bookmark-title {
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .chat-meta,
+      .bookmark-meta {
+        font-size: 0.75rem;
+        color: #aaa;
+      }
+      .delete-btn {
+        background: transparent;
+        border: none;
+        color: #aaa;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: all 0.2s;
+      }
+      .delete-btn:hover {
+        color: #e94560;
+        background: rgba(233, 69, 96, 0.1);
+      }
+      .cache-status {
+        font-size: 0.75rem;
+        color: #aaa;
+        padding: 8px;
+        background: #2a2a2a;
+        border-radius: 6px;
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .cache-status .size {
+        color: #e94560;
+      }
+
+      /* ---------- 设置面板内部组件 ---------- */
+      .settings-group {
+        background: #2a2a2a;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+      }
+      .settings-group label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.85rem;
+        color: #ccc;
+      }
+      .settings-group input[type="color"] {
+        width: 30px;
+        height: 30px;
+        padding: 2px;
+        border: 1px solid #555;
+        border-radius: 4px;
+        background: transparent;
+        cursor: pointer;
+        vertical-align: middle;
+      }
+      .settings-group input[type="range"] {
+        width: 100%;
+        margin: 4px 0;
+      }
+      .settings-group input[type="number"],
+      .settings-group input[type="text"],
+      .settings-group select {
+        background: #333;
+        color: #eee;
+        border: 1px solid #555;
+        border-radius: 4px;
+        padding: 4px 6px;
+        font-size: 13px;
+        width: 100%;
+      }
+      .settings-group .row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .settings-group .row input[type="text"] {
+        flex: 1;
+        min-width: 60px;
+      }
+      .settings-group .row button {
+        background: #444;
+        color: #eee;
+        border: none;
+        padding: 4px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        height: 30px;
+        white-space: nowrap;
+      }
+      .settings-group .row button:hover {
+        background: #666;
+      }
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 6px;
+      }
+      .tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #3a3a3a;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        border: 1px solid #555;
+      }
+      .tag-chip .remove {
+        cursor: pointer;
+        font-size: 0.8rem;
+        color: #aaa;
+      }
+      .tag-chip .remove:hover {
+        color: #e94560;
+      }
+      .switch-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 6px 0;
+      }
+      .switch-row input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #e94560;
+      }
+      .regex-rule-item {
+        background: #333;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+      }
+      .regex-rule-item .row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 4px;
+      }
+      .regex-rule-item .row input {
+        flex: 1;
+        background: #222;
+        border: 1px solid #555;
+        color: #eee;
+        padding: 4px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+        min-width: 50px;
+      }
+      .regex-rule-item .row input[type="text"] {
+        min-width: 70px;
+      }
+      .regex-rule-item .row input[type="checkbox"] {
+        flex: 0;
+        width: 16px;
+        height: 16px;
+        align-self: center;
+      }
+      .regex-rule-item .actions {
+        display: flex;
+        gap: 6px;
+        justify-content: flex-end;
+      }
+      .btn-small {
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        background: #555;
+        border: none;
+        color: #eee;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .btn-small:hover {
+        background: #777;
+      }
+      .btn-danger {
+        background: #a33;
+      }
+      .btn-danger:hover {
+        background: #c44;
+      }
+
       /* ---------- Markdown 内容样式 ---------- */
       .markdown-body {
         background: transparent;
@@ -2239,7 +2554,9 @@
         background: var(--code-bg);
         padding: 12px;
         border-radius: 6px;
-        overflow-x: auto;
+        /* overflow-x: auto; 删除或注释掉 */
+        white-space: pre-wrap; /* 允许自动换行 */
+        word-wrap: break-word; /* 长单词/URL 换行 */
         border: 1px solid #333;
       }
       .markdown-body code {
@@ -2247,6 +2564,8 @@
         padding: 2px 6px;
         border-radius: 4px;
         font-size: 0.9em;
+        white-space: pre-wrap; /* 可选，确保行内代码也换行 */
+        word-break: break-all; /* 可选，强制断词 */
       }
       .markdown-body pre code {
         background: transparent;
@@ -2261,7 +2580,11 @@
         padding: 0 2px;
         box-shadow: 0 0 0 1px #ffaa00;
       }
-
+      .floor-highlight {
+        border: 2px solid #ffaa00 !important;
+        box-shadow: 0 0 16px rgba(255, 170, 0, 0.4);
+        transition: box-shadow 0.3s;
+      }
       .html-block-wrapper {
         margin: 16px 0;
         border-radius: 10px;
@@ -2278,12 +2601,12 @@
         transition: height 0.15s ease;
       }
 
-      /* ---------- 底部分页条 ---------- */
-      .pagination-bar-bottom {
+      /* ---------- 分页 ---------- */
+      .pagination-bar {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 8px 16px;
+        gap: 6px 14px;
         background: #222;
         padding: 8px 14px;
         border-radius: 8px;
@@ -2291,389 +2614,1141 @@
         border: 1px solid #333;
         font-size: 13px;
         color: #ddd;
+        justify-content: center;
       }
-      .pagination-bar-bottom .info {
-        color: #ddd;
-      }
-      .pagination-bar-bottom input[type="number"] {
-        width: 55px;
+      .pagination-bar input[type="number"] {
+        width: 52px;
         background: #333;
         color: #eee;
         border: 1px solid #555;
         border-radius: 4px;
         padding: 3px 5px;
+        height: 28px;
       }
-      .pagination-bar-bottom button {
+      .pagination-bar button {
         background: #444;
         color: #eee;
         border: none;
         padding: 3px 12px;
         border-radius: 4px;
         cursor: pointer;
+        height: 28px;
+        font-size: 12px;
       }
-      .pagination-bar-bottom button:hover {
+      .pagination-bar button:hover {
         background: #666;
       }
-      .pagination-bar-bottom button:disabled {
+      .pagination-bar button:disabled {
         opacity: 0.4;
         cursor: not-allowed;
       }
-      .pagination-bar-bottom .total-blocks {
-        margin-left: auto;
+
+      /* ---------- 消息样式 ---------- */
+      .message {
+        padding: 14px 18px;
+        margin-bottom: 14px;
+        border-radius: 12px;
+        animation: fadeIn 0.3s ease;
+        transition:
+          border 0.2s,
+          box-shadow 0.2s;
+      }
+      .message.user {
+        background: var(--user-bg);
+        margin-left: 12px;
+      }
+      .message.char {
+        background: var(--char-bg);
+        margin-right: 12px;
+      }
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+        flex-wrap: wrap;
+        gap: 2px 8px;
+      }
+      .message-sender {
+        font-weight: bold;
+        color: #e94560;
+      }
+      .message-floor {
+        font-size: 0.8rem;
         color: #888;
-        font-size: 12px;
+        font-weight: normal;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 0 8px;
+        border-radius: 10px;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+      .message-floor.search-highlight {
+        background: #ffaa0055;
+        color: #ffaa00;
+        box-shadow: 0 0 8px rgba(255, 170, 0, 0.5);
+      }
+      .message-time {
+        font-size: 0.78rem;
+        color: #aaa;
+      }
+      .message-content {
+        word-break: break-word;
+        line-height: 1.8;
+      }
+      .message-content q {
+        color: var(--quote-color);
+      }
+      .message-content q::before {
+        content: '"';
+      }
+      .message-content q::after {
+        content: '"';
+      }
+      .bookmark-btn {
+        background: transparent;
+        border: none;
+        color: #aaa;
+        cursor: pointer;
+        padding: 2px 6px;
+        font-size: 1rem;
+        border-radius: 4px;
+        transition: all 0.2s;
+        margin-left: auto;
+        line-height: 1;
+      }
+      .bookmark-btn:hover {
+        color: #e94560;
+        background: rgba(233, 69, 96, 0.1);
+      }
+      .bookmark-btn.bookmarked {
+        color: #e94560;
+      }
+      .highlight-message {
+        border: 2px solid #e94560;
+        box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+        transition: box-shadow 0.3s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .welcome-page {
+        text-align: center;
+        padding: 60px 20px;
+        color: #aaa;
+      }
+      .welcome-page .icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+      }
+      .welcome-page h2 {
+        color: #e0e0e0;
       }
 
-      /* ---------- 回到顶部 ---------- */
-      #backToTop {
+      /* ---------- 滚动按钮 ---------- */
+      #scrollButtons {
         position: fixed;
         bottom: 80px;
-        right: 30px;
+        right: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      #scrollButtons.visible {
+        opacity: 0.7;
+        pointer-events: auto;
+      }
+      #scrollButtons button {
         background: #444;
         color: #eee;
         border: none;
         border-radius: 30px;
-        padding: 10px 16px;
-        font-size: 16px;
+        padding: 8px 14px;
+        font-size: 14px;
         cursor: pointer;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        z-index: 1000;
         transition: 0.2s;
-        opacity: 0.7;
       }
-      #backToTop:hover {
+      #scrollButtons button:hover {
         opacity: 1;
         background: #666;
       }
 
-      /* 响应式 */
+      /* ---------- 响应式 ---------- */
       @media (max-width: 820px) {
         .container {
-          padding-top: 160px;
+          padding-top: 130px;
         }
         #floatingToolbar {
-          padding: 4px 12px 2px 12px;
-          gap: 0px 8px;
+          padding: 3px 8px;
           font-size: 12px;
         }
-        .tb-row {
-          gap: 4px 8px;
-          margin-bottom: 2px;
+        #floatingToolbar input,
+        #floatingToolbar select,
+        #floatingToolbar button {
+          font-size: 12px !important;
+          padding: 2px 5px;
+          min-height: 26px;
+          height: 26px;
+        }
+        #floatingToolbar input[type="number"] {
+          width: 56px;
         }
         #floatingToolbar input[type="text"] {
           width: 70px;
         }
-        #floatingToolbar #fileInput {
-          max-width: 100px;
-          font-size: 11px;
+        #sidebar {
+          width: 320px;
+          left: -320px;
+          padding: 12px;
         }
-        #toolbarToggle {
-          height: 8px;
+        #settingsPanel {
+          width: 360px;
+          right: -360px;
+          padding: 12px;
         }
-        #toolbarToggle::after {
-          font-size: 14px;
-          letter-spacing: 2px;
+        #scrollButtons {
+          bottom: 70px;
+          right: 14px;
         }
-        .pagination-bar-bottom {
-          gap: 6px 12px;
-          font-size: 12px;
-          padding: 6px 10px;
+        #scrollButtons button {
+          padding: 6px 12px;
+          font-size: 13px;
+        }
+        .message {
+          padding: 12px 14px;
+          margin-left: 6px !important;
+          margin-right: 6px !important;
+        }
+        .message.user {
+          margin-left: 6px !important;
+        }
+        .message.char {
+          margin-right: 6px !important;
         }
       }
+
       @media (max-width: 600px) {
         .container {
-          padding-top: 180px;
+          padding-top: 150px;
+          padding-bottom: 70px;
+          padding-left: 4px;
+          padding-right: 4px;
         }
         #floatingToolbar {
-          padding: 4px 8px 2px 8px;
-          gap: 0px 6px;
+          padding: 2px 6px;
           font-size: 11px;
+          gap: 2px;
         }
-        .tb-row {
-          gap: 3px 5px;
-          margin-bottom: 2px;
-        }
-        #floatingToolbar input[type="color"] {
-          width: 18px;
-          height: 18px;
+        #floatingToolbar input,
+        #floatingToolbar select,
+        #floatingToolbar button {
+          font-size: 11px !important;
+          padding: 1px 4px;
+          min-height: 24px;
+          height: 24px;
         }
         #floatingToolbar input[type="number"] {
-          width: 48px;
+          width: 50px;
         }
         #floatingToolbar input[type="text"] {
-          width: 55px;
+          width: 56px;
         }
-        #floatingToolbar button {
-          font-size: 11px;
-          padding: 2px 6px;
-        }
-        #floatingToolbar #fileInput {
-          max-width: 70px;
-          font-size: 10px;
-          padding: 2px 4px;
-        }
-        .tb-sep {
-          display: none;
-        }
-        #toolbarToggle {
-          height: 6px;
-        }
-        #toolbarToggle::after {
-          font-size: 12px;
-          letter-spacing: 1px;
-        }
-        .pagination-bar-bottom {
-          gap: 4px 8px;
-          font-size: 11px;
-        }
-        .pagination-bar-bottom input[type="number"] {
-          width: 45px;
-        }
-      }
-      @media (max-width: 450px) {
-        .container {
-          padding-top: 200px;
+        #floatingToolbar .tb-row {
+          gap: 2px 6px;
         }
         #floatingToolbar label {
           font-size: 10px;
         }
-        #floatingToolbar input[type="text"] {
-          width: 45px;
+        #floatingToolbar .tb-info {
+          font-size: 10px;
         }
+        #sidebar {
+          width: 280px;
+          left: -280px;
+          padding: 10px;
+        }
+        #settingsPanel {
+          width: 300px;
+          right: -300px;
+          padding: 10px;
+        }
+        #scrollButtons {
+          bottom: 60px;
+          right: 10px;
+        }
+        #scrollButtons button {
+          padding: 5px 10px;
+          font-size: 12px;
+        }
+        .message {
+          padding: 10px 12px;
+          margin-bottom: 10px;
+          margin-left: 2px !important;
+          margin-right: 2px !important;
+        }
+        .message.user {
+          margin-left: 2px !important;
+        }
+        .message.char {
+          margin-right: 2px !important;
+        }
+        .message-header {
+          font-size: 0.85rem;
+        }
+        .message-floor {
+          font-size: 0.7rem;
+          padding: 0 6px;
+        }
+        .message-time {
+          font-size: 0.7rem;
+        }
+        .pagination-bar {
+          font-size: 11px;
+          padding: 6px 10px;
+          gap: 4px 10px;
+        }
+        .pagination-bar input[type="number"] {
+          width: 44px;
+          height: 24px;
+          font-size: 11px;
+        }
+        .pagination-bar button {
+          height: 24px;
+          font-size: 11px;
+          padding: 2px 8px;
+        }
+        .settings-group .row {
+          gap: 4px;
+        }
+        .settings-group .row button {
+          font-size: 11px;
+          height: 26px;
+          padding: 2px 8px;
+        }
+        .settings-group input[type="color"] {
+          width: 26px;
+          height: 26px;
+        }
+      }
+
+      /* 确保表单元素在移动端不被缩放 */
+      input,
+      select,
+      textarea,
+      button {
+        font-size: 16px !important;
+      }
+      #floatingToolbar input,
+      #floatingToolbar select,
+      #floatingToolbar button {
+        font-size: 12px !important;
+      }
+      @media (max-width: 820px) {
+        #floatingToolbar input,
+        #floatingToolbar select,
+        #floatingToolbar button {
+          font-size: 12px !important;
+        }
+      }
+      @media (max-width: 600px) {
+        #floatingToolbar input,
+        #floatingToolbar select,
+        #floatingToolbar button {
+          font-size: 11px !important;
+        }
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-color);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #666;
       }
     </style>
   </head>
   <body>
-    <!-- ========== 浮动工具栏 (fixed) ========== -->
+    <!-- ========== 浮动工具栏 ========== -->
     <div id="floatingToolbar">
-      <!-- 第一行：文件 + 颜色 + 字号行高 -->
       <div class="tb-row">
-        <div class="tb-file-wrap">
-          <input type="file" id="fileInput" accept=".txt,.md" />
-        </div>
-        <label>背景 <input type="color" id="bgColor" value="#1a1a1a" /></label>
-        <label
-          >字体 <input type="color" id="textColor" value="#e0e0e0"
-        /></label>
-        <label
-          >引号 <input type="color" id="quoteColor" value="#ffaa88"
-        /></label>
-        <label
-          >斜体 <input type="color" id="italicColor" value="#d0b0ff"
-        /></label>
-        <label>代码块 <input type="color" id="codeBg" value="#2d2d2d" /></label>
-        <label
-          >字号
-          <input
-            type="number"
-            id="fontSize"
-            value="16"
-            min="12"
-            max="28"
-            style="width: 48px"
-        /></label>
-        <label
-          >行高
-          <input
-            type="number"
-            id="lineHeight"
-            value="1.7"
-            step="0.1"
-            min="1.0"
-            max="3.0"
-            style="width: 48px"
-        /></label>
-      </div>
-
-      <!-- 第二行：翻页 + 跳转 + 搜索 + 每页 -->
-      <div class="tb-row">
+        <button id="menuBtn" title="菜单">☰</button>
         <button id="prevPage" disabled>◀</button>
         <span class="tb-info" id="pageInfo">0 / 0</span>
         <button id="nextPage" disabled>▶</button>
         <label
-          >跳转
-          <input
-            type="number"
-            id="jumpPage"
-            min="1"
-            value="1"
-            style="width: 60px"
+          >跳转 <input type="number" id="jumpPage" min="1" value="1"
         /></label>
         <button id="jumpBtn">跳转</button>
+        <!-- 自定义每页条数 -->
         <label
           >每页
-          <select id="pageSizeSelect">
-            <option value="50">50</option>
-            <option value="200" selected>200</option>
-            <option value="500">500</option>
-            <option value="1000">1000</option>
-            <option value="5000">5000</option>
-            <option value="-1">无</option>
-          </select></label
-        >
-        <span class="tb-sep">|</span>
-        <div class="search-wrapper">
           <input
-            type="text"
-            id="searchInput"
-            placeholder="搜索..."
-            style="width: 90px"
+            type="number"
+            id="pageSizeInput"
+            value="200"
+            min="1"
+            step="1"
+            style="width: 64px"
           />
+          <span style="font-size: 10px; color: #888">(-1为无)</span></label
+        >
+        <button id="settingsBtn" title="设置">⚙️</button>
+      </div>
+      <div class="tb-row">
+        <div class="search-wrapper">
+          <input type="text" id="searchInput" placeholder="搜索..." />
           <button class="search-clear" id="searchClear" title="清空搜索">
             ✕
           </button>
+          <button id="searchBtn">查找</button>
+          <span id="searchResult"></span>
+          <button id="searchPrev" style="display: none">◀</button>
+          <button id="searchNext" style="display: none">▶</button>
         </div>
-        <button id="searchBtn">查找</button>
-        <span id="searchResult"></span>
-        <button id="searchPrev" style="display: none">◀</button>
-        <button id="searchNext" style="display: none">▶</button>
-      </div>
-
-      <!-- 第三行：状态消息 -->
-      <div class="tb-row">
         <div id="statusBar"></div>
       </div>
     </div>
 
-    <!-- 点击手柄 -->
+    <!-- 切换手柄 -->
     <div id="toolbarToggle" title="点击显示/隐藏工具栏"></div>
 
-    <!-- ========== 内容区域 ========== -->
-    <div class="container">
-      <div id="content" class="markdown-body"></div>
+    <!-- ========== 侧栏覆盖层 ========== -->
+    <div id="sidebar-overlay"></div>
+    <!-- ========== 侧栏 ========== -->
+    <aside id="sidebar">
+      <div class="panel-section">
+        <h3>📤 导入日志</h3>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept=".txt,.md,.jsonl" multiple />
+          <div class="icon">📂</div>
+          <div class="text">点击或拖拽上传 .txt / .md / .jsonl</div>
+        </div>
+        <div class="cache-status" id="cacheStatus">
+          <span>💾 已缓存: <span class="size" id="cacheSize">0</span></span>
+          <button class="btn-small" onclick="clearAllChats()">清空</button>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h3>📁 聊天记录</h3>
+        <ul class="chat-list" id="chatList">
+          <li class="empty-state" style="color: #666">暂无记录</li>
+        </ul>
+      </div>
+      <div class="panel-section">
+        <h3>
+          ⭐ 收藏夹
+          <span id="bookmarkCount" style="font-size: 0.8rem; color: #aaa"
+            >0</span
+          >
+        </h3>
+        <ul class="bookmark-list" id="bookmarkList">
+          <li class="empty-state" style="color: #666">暂无收藏</li>
+        </ul>
+      </div>
+    </aside>
 
-      <!-- ========== 底部分页条 ========== -->
-      <div class="pagination-bar-bottom" id="bottomPagination">
+    <!-- ========== 设置面板覆盖层 ========== -->
+    <div id="settings-overlay"></div>
+    <!-- ========== 设置面板 ========== -->
+    <aside id="settingsPanel">
+      <!-- 阅读样式 -->
+      <div class="panel-section">
+        <h3>🎨 阅读样式</h3>
+        <div class="settings-group">
+          <div class="row" style="flex-wrap: wrap; gap: 6px">
+            <label
+              >背景 <input type="color" id="bgColor" value="#1a1a1a"
+            /></label>
+            <label
+              >字体 <input type="color" id="textColor" value="#e0e0e0"
+            /></label>
+            <label
+              >引号 <input type="color" id="quoteColor" value="#ffaa88"
+            /></label>
+            <label
+              >斜体 <input type="color" id="italicColor" value="#d0b0ff"
+            /></label>
+            <label
+              >代码块 <input type="color" id="codeBg" value="#2d2d2d"
+            /></label>
+            <label
+              >用户背景 <input type="color" id="userBgColor" value="#2d4a3e"
+            /></label>
+            <label
+              >角色背景 <input type="color" id="charBgColor" value="#3d2a4a"
+            /></label>
+          </div>
+          <div class="row">
+            <label style="flex: 1"
+              >字号
+              <input
+                type="range"
+                id="fontSizeRange"
+                min="12"
+                max="28"
+                value="16"
+              />
+              <span id="fontSizeValue">16px</span>
+            </label>
+            <label style="flex: 1"
+              >行高
+              <input
+                type="range"
+                id="lineHeightRange"
+                min="1.0"
+                max="3.0"
+                step="0.1"
+                value="1.7"
+              />
+              <span id="lineHeightValue">1.7</span>
+            </label>
+          </div>
+          <div class="row" style="margin-top: 6px">
+            <label style="flex: 1"
+              >配色预设
+              <select id="presetSelect"></select>
+            </label>
+            <button id="addPresetBtn" title="添加新预设">➕ 添加</button>
+            <button id="savePresetBtn" title="保存当前样式到当前预设">
+              💾 保存
+            </button>
+            <button id="deletePresetBtn" title="删除当前预设">🗑️ 删除</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 标签提取 -->
+      <div class="panel-section">
+        <h3>🏷️ 标签提取</h3>
+        <div class="settings-group">
+          <div class="row">
+            <input
+              type="text"
+              id="extractInput"
+              placeholder="标签或正则 (/pattern/flags)"
+            />
+            <button id="extractAddBtn">添加</button>
+            <button id="extractScanBtn">扫描</button>
+          </div>
+          <div class="tag-list" id="extractTagList"></div>
+          <div class="switch-row">
+            <input type="checkbox" id="extractEnable" />
+            <label for="extractEnable">启用提取（只显示匹配内容）</label>
+          </div>
+          <div
+            id="extractDetectedArea"
+            style="display: none; margin-top: 6px"
+          ></div>
+        </div>
+      </div>
+
+      <!-- 标签排除 -->
+      <div class="panel-section">
+        <h3>🚫 标签排除</h3>
+        <div class="settings-group">
+          <div class="row">
+            <input
+              type="text"
+              id="excludeInput"
+              placeholder="标签或正则 (/pattern/flags)"
+            />
+            <button id="excludeAddBtn">添加</button>
+            <button id="excludeScanBtn">扫描</button>
+          </div>
+          <div class="tag-list" id="excludeTagList"></div>
+          <div
+            id="excludeDetectedArea"
+            style="display: none; margin-top: 6px"
+          ></div>
+        </div>
+      </div>
+
+      <!-- 正则替换 -->
+      <div class="panel-section">
+        <h3>🔧 正则替换</h3>
+        <div id="regexRulesContainer"></div>
+        <button id="addRegexBtn">+ 添加规则</button>
+      </div>
+
+      <!-- 数据管理 -->
+      <div
+        class="panel-section"
+        style="border-top: 1px solid var(--border-color); padding-top: 16px"
+      >
+        <h3>💾 数据管理</h3>
+        <div class="settings-group">
+          <div class="row" style="gap: 8px">
+            <button id="exportSettingsBtn" style="flex: 1">📤 导出设置</button>
+            <button id="importSettingsBtn" style="flex: 1">📥 导入设置</button>
+          </div>
+          <button
+            id="clearAllDataBtn"
+            style="width: 100%; margin-top: 8px; background: #a33"
+          >
+            🗑️ 清除所有数据
+          </button>
+          <input
+            type="file"
+            id="importSettingsFile"
+            accept=".json"
+            style="display: none"
+          />
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========== 主内容 ========== -->
+    <div class="container" id="mainContainer">
+      <div id="content" class="markdown-body">
+        <div class="welcome-page">
+          <div class="icon">📖</div>
+          <h2>欢迎使用酒馆聊天阅读器</h2>
+          <p>点击左上角 ☰ 导入聊天记录</p>
+        </div>
+      </div>
+      <div class="pagination-bar" id="bottomPagination">
         <button id="prevPageBottom" disabled>◀ 上一页</button>
-        <span class="info" id="pageInfoBottom">0 / 0</span>
+        <span class="tb-info" id="pageInfoBottom">0 / 0</span>
         <button id="nextPageBottom" disabled>下一页 ▶</button>
         <label
           >跳转 <input type="number" id="jumpPageBottom" min="1" value="1"
         /></label>
         <button id="jumpBtnBottom">跳转</button>
-        <span class="total-blocks"
+        <span style="color: #888; font-size: 12px; margin-left: 8px"
           >共 <span id="totalBlocks">0</span> 个块</span
         >
       </div>
     </div>
 
-    <!-- 回到顶部 -->
-    <button id="backToTop" title="回到顶部">⬆</button>
+    <!-- ========== 滚动按钮 ========== -->
+    <div id="scrollButtons">
+      <button id="backToTop">⬆ 回顶</button>
+      <button id="backToBottom">⬇ 回底</button>
+    </div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // ========== 核心状态 ==========
-        let allTokens = [];
-        let pages = [];
-        let currentPage = 0;
-        let pageSize = 200;
-        let searchMatches = [];
-        let searchIndex = -1;
-        let currentSearchQuery = "";
-        let statusTimer = null;
+      (function () {
+        "use strict";
 
-        // DOM 引用
-        const fileInput = document.getElementById("fileInput");
-        const statusBar = document.getElementById("statusBar");
-        const contentDiv = document.getElementById("content");
-        const prevBtn = document.getElementById("prevPage");
-        const nextBtn = document.getElementById("nextPage");
-        const pageInfo = document.getElementById("pageInfo");
-        const jumpPage = document.getElementById("jumpPage");
-        const jumpBtn = document.getElementById("jumpBtn");
-        const pageSizeSelect = document.getElementById("pageSizeSelect");
-        const searchInput = document.getElementById("searchInput");
-        const searchBtn = document.getElementById("searchBtn");
-        const searchResult = document.getElementById("searchResult");
-        const searchPrev = document.getElementById("searchPrev");
-        const searchNext = document.getElementById("searchNext");
-        const searchClear = document.getElementById("searchClear");
-        const totalBlocksSpan = document.getElementById("totalBlocks");
-        // 底部控件
-        const prevBtnB = document.getElementById("prevPageBottom");
-        const nextBtnB = document.getElementById("nextPageBottom");
-        const pageInfoB = document.getElementById("pageInfoBottom");
-        const jumpPageB = document.getElementById("jumpPageBottom");
-        const jumpBtnB = document.getElementById("jumpBtnBottom");
+        // ===== 1. 依赖检查 =====
+        if (typeof marked === "undefined") {
+          console.error("marked 库未加载，请补充！");
+          document.getElementById("content").innerHTML =
+            '<p style="color:#e94560;padding:20px;">❌ 错误：marked 库未加载，请检查 HTML 头部。</p>';
+          return;
+        }
 
-        // 样式控件
-        const vars = {
-          bg: document.getElementById("bgColor"),
-          text: document.getElementById("textColor"),
-          quote: document.getElementById("quoteColor"),
-          italic: document.getElementById("italicColor"),
-          codeBg: document.getElementById("codeBg"),
-          fontSize: document.getElementById("fontSize"),
-          lineHeight: document.getElementById("lineHeight"),
+        // ===== 2. 工具函数 =====
+        function escapeHtml(str) {
+          if (typeof str !== "string") return "";
+          return str.replace(/[&<>"']/g, function (m) {
+            return {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[m];
+          });
+        }
+
+        function generateHash(str) {
+          var hash = 0;
+          for (var i = 0; i < str.length; i++) {
+            hash = (hash << 5) - hash + str.charCodeAt(i);
+            hash = hash & hash;
+          }
+          return "chat_" + Math.abs(hash).toString(16);
+        }
+
+        function formatTime(timestamp) {
+          if (!timestamp && timestamp !== 0) return "";
+          try {
+            var d;
+            if (typeof timestamp === "number") {
+              if (timestamp < 10000000000) {
+                d = new Date(timestamp * 1000);
+              } else {
+                d = new Date(timestamp);
+              }
+            } else if (typeof timestamp === "string") {
+              var trimmed = timestamp.trim();
+              var num = parseInt(trimmed);
+              if (!isNaN(num) && trimmed.length > 0) {
+                if (num < 10000000000) {
+                  d = new Date(num * 1000);
+                } else {
+                  d = new Date(num);
+                }
+              } else {
+                var iso = trimmed.replace(" ", "T");
+                d = new Date(iso);
+              }
+            } else {
+              return "";
+            }
+            if (isNaN(d.getTime())) return "";
+            var year = d.getFullYear();
+            if (year < 1970 || year > 2100) return "";
+            return d.toLocaleString("zh-CN", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            });
+          } catch (_) {
+            return "";
+          }
+        }
+
+        function escapeRegex(s) {
+          return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        }
+
+        function parseRegex(str) {
+          if (!str || typeof str !== "string") return null;
+          var trimmed = str.trim();
+          var match = trimmed.match(/^\/(.+)\/([a-z]*)$/);
+          if (match) {
+            try {
+              var flags = match[2] || "";
+              if (!flags.includes("g")) flags += "g";
+              return new RegExp(match[1], flags);
+            } catch (_) {
+              return null;
+            }
+          }
+          return null;
+        }
+
+        function buildExcludePatterns(tagList) {
+          var patterns = [];
+          tagList.forEach(function (tag) {
+            var rx = parseRegex(tag);
+            if (rx) {
+              patterns.push({ type: "regex", regex: rx });
+              return;
+            }
+            if (tag.includes(":") && !tag.startsWith("</")) {
+              var colonIdx = tag.indexOf(":");
+              var tagName = tag.slice(0, colonIdx).trim().replace(/^<|>$/g, "");
+              var keyword = tag.slice(colonIdx + 1).trim();
+              if (tagName && keyword) {
+                patterns.push({
+                  type: "conditional",
+                  regex: new RegExp(
+                    "<" +
+                      escapeRegex(tagName) +
+                      "[^>]*>\\s*<summary[^>]*>[^<]*" +
+                      escapeRegex(keyword) +
+                      "[^<]*</summary>[\\s\\S]*?</" +
+                      escapeRegex(tagName) +
+                      ">",
+                    "gi",
+                  ),
+                });
+              }
+              return;
+            }
+            if (tag.startsWith("</") && tag.endsWith(">")) {
+              var tagName2 = tag.slice(2, -1);
+              patterns.push({
+                type: "before",
+                regex: new RegExp(
+                  "^[\\s\\S]*?<\\/" + escapeRegex(tagName2) + ">",
+                  "gi",
+                ),
+              });
+              return;
+            }
+            var cleanTag = tag.replace(/^<|>$/g, "");
+            patterns.push({
+              type: "pair",
+              regex: new RegExp(
+                "<" +
+                  escapeRegex(cleanTag) +
+                  "(?:\\s[^>]*)?>[\\s\\S]*?</" +
+                  escapeRegex(cleanTag) +
+                  ">",
+                "gi",
+              ),
+            });
+          });
+          return patterns;
+        }
+
+        function applyExcludePatterns(content, patterns) {
+          if (!patterns || patterns.length === 0) return content;
+          var result = content;
+          patterns.forEach(function (p) {
+            result = result.replace(p.regex, "");
+          });
+          result = result.replace(/\n{3,}/g, "\n\n");
+          return result.trim();
+        }
+
+        function extractTagContent(text, extractList, enable) {
+          if (!enable || !extractList || extractList.length === 0) return text;
+          var results = [];
+          extractList.forEach(function (item) {
+            var rx = parseRegex(item);
+            if (rx) {
+              var matches = text.matchAll(rx);
+              for (var m of matches) {
+                results.push(m.length > 1 ? m[1] : m[0]);
+              }
+            } else {
+              var tag = item.replace(/^<|>$/g, "");
+              var regex = new RegExp(
+                "<" +
+                  escapeRegex(tag) +
+                  "(?:\\s[^>]*)?>([\\s\\S]*?)</" +
+                  escapeRegex(tag) +
+                  ">",
+                "gi",
+              );
+              var matches2 = text.matchAll(regex);
+              for (var m2 of matches2) {
+                results.push(m2[1]);
+              }
+            }
+          });
+          if (results.length === 0) return "";
+          return results.join("\n\n");
+        }
+
+        function scanTags(messages) {
+          var tagCounts = {};
+          var htmlTags = [
+            "br",
+            "img",
+            "p",
+            "div",
+            "span",
+            "audio",
+            "video",
+            "strong",
+            "em",
+            "u",
+            "s",
+            "code",
+            "pre",
+            "hr",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "input",
+            "button",
+            "script",
+            "style",
+            "link",
+            "meta",
+            "table",
+            "thead",
+            "tbody",
+            "tr",
+            "td",
+            "th",
+            "b",
+            "i",
+            "font",
+            "center",
+            "strike",
+          ];
+          messages.forEach(function (msg) {
+            var text = msg.mes || "";
+            var matches = text.matchAll(
+              /<([\u4e00-\u9fa5a-zA-Z0-9_\-\.]+)(?:\s[^>]*)?>[\s\S]*?<\/\1>/g,
+            );
+            for (var m of matches) {
+              var t = m[1];
+              var tLower = t.toLowerCase();
+              if (htmlTags.indexOf(tLower) !== -1) continue;
+              tagCounts[t] = (tagCounts[t] || 0) + 1;
+            }
+          });
+          return Object.keys(tagCounts).sort(function (a, b) {
+            return tagCounts[b] - tagCounts[a];
+          });
+        }
+
+        // ===== 3. IndexedDB =====
+        var DB_NAME = "STReaderDB";
+        var STORE_CHATS = "chats";
+        var db = null;
+
+        function initDB() {
+          return new Promise(function (resolve, reject) {
+            var request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = function (e) {
+              var database = e.target.result;
+              if (!database.objectStoreNames.contains(STORE_CHATS)) {
+                database.createObjectStore(STORE_CHATS, { keyPath: "id" });
+              }
+            };
+            request.onsuccess = function () {
+              db = request.result;
+              resolve(db);
+            };
+            request.onerror = function () {
+              reject(request.error);
+            };
+          });
+        }
+
+        function saveChat(chatId, chatData) {
+          return new Promise(function (resolve, reject) {
+            var tx = db.transaction(STORE_CHATS, "readwrite");
+            tx.objectStore(STORE_CHATS).put({ id: chatId, data: chatData });
+            tx.oncomplete = resolve;
+            tx.onerror = function () {
+              reject(tx.error);
+            };
+          });
+        }
+
+        function loadAllChats() {
+          return new Promise(function (resolve, reject) {
+            var tx = db.transaction(STORE_CHATS, "readonly");
+            var req = tx.objectStore(STORE_CHATS).getAll();
+            req.onsuccess = function () {
+              var chats = {};
+              req.result.forEach(function (item) {
+                chats[item.id] = item.data;
+              });
+              resolve(chats);
+            };
+            req.onerror = function () {
+              reject(req.error);
+            };
+          });
+        }
+
+        function deleteChatFromDB(chatId) {
+          return new Promise(function (resolve, reject) {
+            var tx = db.transaction(STORE_CHATS, "readwrite");
+            tx.objectStore(STORE_CHATS).delete(chatId);
+            tx.oncomplete = resolve;
+            tx.onerror = function () {
+              reject(tx.error);
+            };
+          });
+        }
+
+        function clearAllChatsDB() {
+          return new Promise(function (resolve, reject) {
+            var tx = db.transaction(STORE_CHATS, "readwrite");
+            tx.objectStore(STORE_CHATS).clear();
+            tx.oncomplete = resolve;
+            tx.onerror = function () {
+              reject(tx.error);
+            };
+          });
+        }
+
+        // ===== 4. 全局状态 =====
+        var state = {
+          chats: {},
+          currentChatId: null,
+          currentPage: 1,
+          pages: [],
+          pageSize: 200,
+          bookmarks: [],
+          extractTags: [],
+          excludeTags: [],
+          regexRules: [],
+          presets: [],
+          activePresetId: null,
+          settings: {
+            bg: "#1a1a1a",
+            text: "#e0e0e0",
+            quote: "#ffaa88",
+            italic: "#d0b0ff",
+            codeBg: "#2d2d2d",
+            userBg: "#2d4a3e",
+            charBg: "#3d2a4a",
+            fontSize: 16,
+            lineHeight: 1.7,
+            extractEnabled: false,
+            showUser: true,
+          },
+          searchMatches: [],
+          searchIndex: -1,
+          currentSearchQuery: "",
+          isJsonlChat: false,
+          scanResults: { extract: [], exclude: [] },
         };
 
-        // ========== 样式应用 ==========
+        // ===== 5. DOM =====
+        var $ = function (id) {
+          return document.getElementById(id);
+        };
+        var els = {
+          menuBtn: $("menuBtn"),
+          settingsBtn: $("settingsBtn"),
+          prevPage: $("prevPage"),
+          nextPage: $("nextPage"),
+          pageInfo: $("pageInfo"),
+          jumpPage: $("jumpPage"),
+          jumpBtn: $("jumpBtn"),
+          pageSizeInput: $("pageSizeInput"),
+          searchInput: $("searchInput"),
+          searchBtn: $("searchBtn"),
+          searchClear: $("searchClear"),
+          searchResult: $("searchResult"),
+          searchPrev: $("searchPrev"),
+          searchNext: $("searchNext"),
+          statusBar: $("statusBar"),
+          content: $("content"),
+          sidebar: $("sidebar"),
+          sidebarOverlay: $("sidebar-overlay"),
+          settingsPanel: $("settingsPanel"),
+          settingsOverlay: $("settings-overlay"),
+          fileInput: $("fileInput"),
+          uploadZone: $("uploadZone"),
+          chatList: $("chatList"),
+          bookmarkList: $("bookmarkList"),
+          bookmarkCount: $("bookmarkCount"),
+          cacheSize: $("cacheSize"),
+          totalBlocks: $("totalBlocks"),
+          prevPageBottom: $("prevPageBottom"),
+          nextPageBottom: $("nextPageBottom"),
+          pageInfoBottom: $("pageInfoBottom"),
+          jumpPageBottom: $("jumpPageBottom"),
+          jumpBtnBottom: $("jumpBtnBottom"),
+          backToTop: $("backToTop"),
+          backToBottom: $("backToBottom"),
+          bgColor: $("bgColor"),
+          textColor: $("textColor"),
+          quoteColor: $("quoteColor"),
+          italicColor: $("italicColor"),
+          codeBg: $("codeBg"),
+          userBgColor: $("userBgColor"),
+          charBgColor: $("charBgColor"),
+          fontSizeRange: $("fontSizeRange"),
+          fontSizeValue: $("fontSizeValue"),
+          lineHeightRange: $("lineHeightRange"),
+          lineHeightValue: $("lineHeightValue"),
+          presetSelect: $("presetSelect"),
+          addPresetBtn: $("addPresetBtn"),
+          savePresetBtn: $("savePresetBtn"),
+          deletePresetBtn: $("deletePresetBtn"),
+          extractInput: $("extractInput"),
+          extractAddBtn: $("extractAddBtn"),
+          extractScanBtn: $("extractScanBtn"),
+          extractTagList: $("extractTagList"),
+          extractEnable: $("extractEnable"),
+          extractDetectedArea: $("extractDetectedArea"),
+          excludeInput: $("excludeInput"),
+          excludeAddBtn: $("excludeAddBtn"),
+          excludeScanBtn: $("excludeScanBtn"),
+          excludeTagList: $("excludeTagList"),
+          excludeDetectedArea: $("excludeDetectedArea"),
+          regexRulesContainer: $("regexRulesContainer"),
+          addRegexBtn: $("addRegexBtn"),
+          exportSettingsBtn: $("exportSettingsBtn"),
+          importSettingsBtn: $("importSettingsBtn"),
+          importSettingsFile: $("importSettingsFile"),
+          clearAllDataBtn: $("clearAllDataBtn"),
+        };
+
+        // ===== 6. 样式应用 =====
         function applyStyles() {
           document.documentElement.style.setProperty(
             "--bg-color",
-            vars.bg.value,
+            els.bgColor.value,
           );
           document.documentElement.style.setProperty(
             "--text-color",
-            vars.text.value,
+            els.textColor.value,
           );
           document.documentElement.style.setProperty(
             "--quote-color",
-            vars.quote.value,
+            els.quoteColor.value,
           );
           document.documentElement.style.setProperty(
             "--italic-color",
-            vars.italic.value,
+            els.italicColor.value,
           );
           document.documentElement.style.setProperty(
             "--code-bg",
-            vars.codeBg.value,
+            els.codeBg.value,
+          );
+          document.documentElement.style.setProperty(
+            "--user-bg",
+            els.userBgColor.value,
+          );
+          document.documentElement.style.setProperty(
+            "--char-bg",
+            els.charBgColor.value,
           );
           document.documentElement.style.setProperty(
             "--font-size",
-            vars.fontSize.value + "px",
+            els.fontSizeRange.value + "px",
           );
           document.documentElement.style.setProperty(
             "--line-height",
-            vars.lineHeight.value,
+            els.lineHeightRange.value,
           );
+          els.fontSizeValue.textContent = els.fontSizeRange.value + "px";
+          els.lineHeightValue.textContent = els.lineHeightRange.value;
         }
-        Object.values(vars).forEach((el) =>
-          el.addEventListener("input", applyStyles),
-        );
-        vars.fontSize.addEventListener("change", applyStyles);
-        vars.lineHeight.addEventListener("change", applyStyles);
-        applyStyles();
 
-        // ========== 状态消息 ==========
+        // ===== 7. 状态消息 =====
+        var statusTimer = null;
+
         function setStatus(msg, type) {
           if (statusTimer) {
             clearTimeout(statusTimer);
             statusTimer = null;
           }
-          statusBar.textContent = msg;
-          statusBar.className = "";
-          if (type === "error") statusBar.classList.add("error");
-          else if (type === "success") statusBar.classList.add("success");
-          statusBar.classList.add("visible");
-          statusTimer = setTimeout(() => {
-            statusBar.classList.remove("visible");
-            setTimeout(() => {
-              statusBar.textContent = "";
-              statusBar.className = "";
+          els.statusBar.textContent = msg;
+          els.statusBar.className = "";
+          if (type === "error") els.statusBar.classList.add("error");
+          else if (type === "success") els.statusBar.classList.add("success");
+          els.statusBar.classList.add("visible");
+          statusTimer = setTimeout(function () {
+            els.statusBar.classList.remove("visible");
+            setTimeout(function () {
+              els.statusBar.textContent = "";
+              els.statusBar.className = "";
             }, 500);
             statusTimer = null;
           }, 4000);
         }
 
-        // ========== 浮动工具栏显隐 ==========
-        const toolbar = document.getElementById("floatingToolbar");
-        const toggleHandle = document.getElementById("toolbarToggle");
-        let isToolbarVisible = true;
-        let lastScrollY = window.scrollY;
-        let scrollThreshold = 20;
-        let scrollTimer = null;
-        let ignoreScrollHide = false;
+        // ===== 8. 工具栏显隐 =====
+        var toolbar = document.getElementById("floatingToolbar");
+        var toggleHandle = document.getElementById("toolbarToggle");
+        var isToolbarVisible = true;
+        var lastScrollY = window.scrollY;
+        var scrollThreshold = 20;
+        var scrollTimer = null;
+        var ignoreScrollHide = false;
 
         function showToolbar() {
           if (isToolbarVisible) return;
@@ -2695,43 +3770,18 @@
           e.stopPropagation();
           toggleToolbar();
         });
-        toolbar.addEventListener("click", function (e) {
-          const tag = e.target.tagName.toLowerCase();
-          if (
-            tag === "button" ||
-            tag === "input" ||
-            tag === "select" ||
-            tag === "label"
-          )
-            return;
-          toggleToolbar();
-        });
 
         function handleScroll() {
           if (ignoreScrollHide) return;
-          const currentScrollY = window.scrollY;
-          const delta = currentScrollY - lastScrollY;
-
-          // 新增：控制回顶按钮
-          const backToTop = document.getElementById("backToTop");
-          // 只在滚动超过 200px 时才显示，避免页面顶部出现
+          var currentScrollY = window.scrollY;
+          var delta = currentScrollY - lastScrollY;
+          var scrollBtns = document.getElementById("scrollButtons");
           if (currentScrollY > 200) {
-            if (delta > 0) {
-              // 向下滚动 → 隐藏
-              backToTop.style.opacity = "0";
-              backToTop.style.pointerEvents = "none";
-            } else if (delta < 0) {
-              // 向上滚动 → 显示
-              backToTop.style.opacity = "0.7";
-              backToTop.style.pointerEvents = "auto";
-            }
+            if (delta > 0) scrollBtns.classList.remove("visible");
+            else if (delta < 0) scrollBtns.classList.add("visible");
           } else {
-            // 页面顶部时隐藏
-            backToTop.style.opacity = "0";
-            backToTop.style.pointerEvents = "none";
+            scrollBtns.classList.remove("visible");
           }
-
-          // 原有的工具栏显隐逻辑保持不变
           if (Math.abs(delta) > scrollThreshold) {
             if (delta > 0) hideToolbar();
             else showToolbar();
@@ -2748,464 +3798,1676 @@
         );
         showToolbar();
 
-        // ========== 后处理：引号颜色 + 搜索高亮 ==========
+        // ===== 9. 侧栏/面板控制 =====
+        function toggleSidebar(open) {
+          var isOpen = els.sidebar.classList.contains("open");
+          if (open === undefined) open = !isOpen;
+          els.sidebar.classList.toggle("open", open);
+          els.sidebarOverlay.classList.toggle("open", open);
+          if (open) els.settingsPanel.classList.remove("open");
+        }
+
+        function toggleSettings(open) {
+          var isOpen = els.settingsPanel.classList.contains("open");
+          if (open === undefined) open = !isOpen;
+          els.settingsPanel.classList.toggle("open", open);
+          els.settingsOverlay.classList.toggle("open", open);
+          if (open) els.sidebar.classList.remove("open");
+        }
+        els.menuBtn.addEventListener("click", function () {
+          toggleSidebar();
+        });
+        els.sidebarOverlay.addEventListener("click", function () {
+          toggleSidebar(false);
+        });
+        els.settingsBtn.addEventListener("click", function () {
+          toggleSettings();
+        });
+        els.settingsOverlay.addEventListener("click", function () {
+          toggleSettings(false);
+        });
+
+        // ===== 10. 渲染聊天列表 =====
+        function renderChatList() {
+          var ids = Object.keys(state.chats);
+          if (ids.length === 0) {
+            els.chatList.innerHTML =
+              '<li class="empty-state" style="color:#666;">暂无记录</li>';
+            return;
+          }
+          els.chatList.innerHTML = ids
+            .map(function (id) {
+              var chat = state.chats[id];
+              var name = chat.name || "未命名";
+              var count = chat.messages
+                ? chat.messages.length
+                : chat.tokens
+                  ? chat.tokens.length
+                  : 0;
+              return (
+                '<li class="' +
+                (id === state.currentChatId ? "active" : "") +
+                '" onclick="selectChat(\'' +
+                id +
+                "')\">" +
+                '<div class="chat-info">' +
+                '<div class="chat-name">' +
+                escapeHtml(name) +
+                "</div>" +
+                '<div class="chat-meta">' +
+                count +
+                " 条" +
+                (chat.isJsonl ? " 📄" : "") +
+                "</div>" +
+                "</div>" +
+                '<button class="delete-btn" onclick="event.stopPropagation(); deleteChatItem(\'' +
+                id +
+                "')\">🗑️</button>" +
+                "</li>"
+              );
+            })
+            .join("");
+          updateCacheStatus();
+        }
+
+        function updateCacheStatus() {
+          var ids = Object.keys(state.chats);
+          var total = 0;
+          ids.forEach(function (id) {
+            var chat = state.chats[id];
+            total += chat.messages
+              ? chat.messages.length
+              : chat.tokens
+                ? chat.tokens.length
+                : 0;
+          });
+          els.cacheSize.textContent = ids.length + " 个对话 / " + total + " 条";
+        }
+
+        // ===== 11. 选择聊天 =====
+        window.selectChat = function (chatId) {
+          if (!state.chats[chatId]) return;
+          state.currentChatId = chatId;
+          state.currentPage = 1;
+          var chat = state.chats[chatId];
+          if (
+            chat.messages &&
+            chat.messages.length > 0 &&
+            chat.messages[0].mes !== undefined
+          ) {
+            state.isJsonlChat = true;
+            buildJsonlPages();
+          } else {
+            state.isJsonlChat = false;
+            buildTokenPages();
+          }
+          renderCurrentPage(false);
+          renderChatList();
+          renderBookmarkList();
+          toggleSidebar(false);
+          renderScanResults("extract");
+          renderScanResults("exclude");
+        };
+
+        // ===== 12. 删除聊天 =====
+        window.deleteChatItem = function (chatId) {
+          if (!confirm("确定删除此聊天记录？")) return;
+          deleteChatFromDB(chatId);
+          delete state.chats[chatId];
+          state.bookmarks = state.bookmarks.filter(function (b) {
+            return b.chatId !== chatId;
+          });
+          saveSettings();
+          if (state.currentChatId === chatId) {
+            state.currentChatId = null;
+            state.pages = [];
+            els.content.innerHTML =
+              '<div class="welcome-page"><div class="icon">📖</div><h2>请选择聊天记录</h2></div>';
+            els.pageInfo.textContent = "0 / 0";
+            els.pageInfoBottom.textContent = "0 / 0";
+            els.totalBlocks.textContent = "0";
+          }
+          renderChatList();
+          renderBookmarkList();
+          updateCacheStatus();
+        };
+
+        // ===== 13. 构建分页（JSONL）—— 按条数分页 =====
+        function buildJsonlPages() {
+          var chat = state.chats[state.currentChatId];
+          if (!chat || !chat.messages) {
+            state.pages = [];
+            return;
+          }
+          var messages = chat.messages;
+          var size = state.pageSize === -1 ? messages.length : state.pageSize;
+          var pages = [];
+          for (var i = 0; i < messages.length; i += size) {
+            pages.push(messages.slice(i, i + size));
+          }
+          state.pages = pages;
+          updatePaginationUI();
+        }
+
+        // ===== 14. 构建分页（Token） =====
+        function buildTokenPages() {
+          var chat = state.chats[state.currentChatId];
+          if (!chat || !chat.tokens) {
+            state.pages = [];
+            return;
+          }
+          var tokens = chat.tokens;
+          var size = state.pageSize === -1 ? tokens.length : state.pageSize;
+          var pages = [];
+          for (var i = 0; i < tokens.length; i += size) {
+            pages.push(tokens.slice(i, i + size));
+          }
+          state.pages = pages;
+          updatePaginationUI();
+        }
+
+        // ===== 15. 渲染当前页（支持noScroll参数） =====
+        function renderCurrentPage(noScroll) {
+          if (!state.currentChatId || state.pages.length === 0) {
+            els.content.innerHTML =
+              '<div class="welcome-page"><div class="icon">📖</div><h2>请选择聊天记录</h2></div>';
+            els.pageInfo.textContent = "0 / 0";
+            els.pageInfoBottom.textContent = "0 / 0";
+            els.totalBlocks.textContent = "0";
+            return;
+          }
+          var pageIndex = Math.min(
+            Math.max(state.currentPage - 1, 0),
+            state.pages.length - 1,
+          );
+          state.currentPage = pageIndex + 1;
+          var pageData = state.pages[pageIndex];
+          var html = "";
+          var renderer = getMarkdownRenderer();
+          var searchQuery = state.currentSearchQuery.trim();
+
+          if (state.isJsonlChat) {
+            var allMessages = state.chats[state.currentChatId].messages;
+            var startIdx = -1;
+            if (pageData.length > 0) {
+              startIdx = allMessages.indexOf(pageData[0]);
+              if (startIdx === -1) {
+                var first = pageData[0];
+                for (var i = 0; i < allMessages.length; i++) {
+                  if (
+                    allMessages[i] === first ||
+                    (allMessages[i].message_id !== undefined &&
+                      allMessages[i].message_id === first.message_id) ||
+                    (allMessages[i].id !== undefined &&
+                      allMessages[i].id === first.id)
+                  ) {
+                    startIdx = i;
+                    break;
+                  }
+                }
+              }
+            }
+            if (startIdx === -1) startIdx = 0;
+
+            pageData.forEach(function (msg, idx) {
+              var isUser = msg.is_user;
+              var sender = msg.name || (isUser ? "User" : "Char");
+              var time = formatTime(msg.send_date);
+              var floor = null;
+              if (
+                msg.message_id !== undefined &&
+                msg.message_id !== null &&
+                msg.message_id !== ""
+              ) {
+                floor = msg.message_id;
+              } else if (
+                msg.id !== undefined &&
+                msg.id !== null &&
+                msg.id !== ""
+              ) {
+                floor = msg.id;
+              } else {
+                floor = startIdx + idx;
+              }
+              var floorStr = String(floor);
+
+              var floorMatch = false;
+              if (
+                searchQuery &&
+                floorStr.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1
+              ) {
+                floorMatch = true;
+              }
+
+              var content = msg.mes || "";
+              // 判断是否包含 HTML 代码块
+              var hasHtmlCodeBlock = /```\s*html\s*[\s\S]*?```/i.test(content);
+              if (!hasHtmlCodeBlock) {
+                // 只有不包含 HTML 代码块时才应用过滤
+                var excludePatterns = buildExcludePatterns(state.excludeTags);
+                content = applyExcludePatterns(content, excludePatterns);
+                if (state.settings.extractEnabled) {
+                  content =
+                    extractTagContent(content, state.extractTags, true) || "";
+                }
+              }
+              // 如果包含代码块，则保持原始 content 不变，直接交给 marked 渲染
+              if (!content.trim()) return;
+              var contentHtml = "";
+              // 优先检测并提取 ```html 代码块
+              var codeBlockMatch = content.match(/```html\s*([\s\S]*?)```/);
+              if (codeBlockMatch) {
+                var code = codeBlockMatch[1];
+                var encoded = encodeURIComponent(code)
+                  .replace(/'/g, "%27")
+                  .replace(/"/g, "%22");
+                contentHtml =
+                  '<div class="html-block-wrapper"><iframe src="data:text/html;charset=utf-8,' +
+                  encoded +
+                  '" sandbox="allow-scripts allow-same-origin allow-modals" style="width:100%;border:none;background:#fff;height:200px;" onload="(function(el){function resize(){try{var doc=el.contentWindow.document;var h=doc.documentElement.scrollHeight||doc.body.scrollHeight||200;if(h>50)el.style.height=(h+20)+\'px\';}catch(e){el.style.height=\'800px\';}}resize();setTimeout(resize,500);setTimeout(resize,1500);})(this)"></iframe></div>';
+              } else {
+                contentHtml = marked.parse(content, { renderer: renderer });
+              }
+              var tempDiv = document.createElement("div");
+              tempDiv.innerHTML = contentHtml;
+              postProcessTextNodes(tempDiv, state.currentSearchQuery);
+              contentHtml = tempDiv.innerHTML;
+
+              var isBookmarked = state.bookmarks.some(function (b) {
+                return (
+                  b.chatId === state.currentChatId &&
+                  b.page === state.currentPage &&
+                  b.messageIndex === idx
+                );
+              });
+
+              var floorClass =
+                "message-floor" + (floorMatch ? " search-highlight" : "");
+              var floorHtml =
+                '<span class="' +
+                floorClass +
+                '">#' +
+                escapeHtml(floorStr) +
+                "</span>";
+
+              var msgClass =
+                (isUser ? "user" : "char") +
+                (floorMatch ? " floor-highlight" : "");
+
+              html +=
+                '<div class="message ' +
+                msgClass +
+                '" data-page="' +
+                state.currentPage +
+                '" data-index="' +
+                idx +
+                '">' +
+                '<div class="message-header">' +
+                '<span class="message-sender">' +
+                escapeHtml(sender) +
+                "</span>" +
+                floorHtml +
+                (time ? '<span class="message-time">' + time + "</span>" : "") +
+                '<button class="bookmark-btn ' +
+                (isBookmarked ? "bookmarked" : "") +
+                '" onclick="toggleBookmark(' +
+                state.currentPage +
+                ", " +
+                idx +
+                ')">' +
+                (isBookmarked ? "★" : "☆") +
+                "</button>" +
+                "</div>" +
+                '<div class="message-content">' +
+                contentHtml +
+                "</div>" +
+                "</div>";
+            });
+          } else {
+            html = marked.parser(pageData, { renderer: renderer });
+            var tempDiv2 = document.createElement("div");
+            tempDiv2.innerHTML = html;
+            postProcessTextNodes(tempDiv2, state.currentSearchQuery);
+            html = tempDiv2.innerHTML;
+          }
+
+          els.content.innerHTML =
+            html || '<p style="color:#666;padding:20px;">该页无内容</p>';
+
+          var total = state.pages.length;
+          var infoText =
+            total === 1 && state.pageSize === -1
+              ? "无分页"
+              : state.currentPage + " / " + total;
+          els.pageInfo.textContent = infoText;
+          els.pageInfoBottom.textContent = infoText;
+          els.totalBlocks.textContent = state.isJsonlChat
+            ? state.chats[state.currentChatId].messages.length
+            : state.chats[state.currentChatId].tokens
+              ? state.chats[state.currentChatId].tokens.length
+              : 0;
+          updatePaginationButtons();
+          els.jumpPage.value = state.currentPage;
+          els.jumpPage.max = total;
+          els.jumpPageBottom.value = state.currentPage;
+          els.jumpPageBottom.max = total;
+
+          // 滚动处理
+          if (!noScroll) {
+            // 如果有搜索匹配且不是清空搜索，滚动到匹配位置
+            if (state.searchMatches.length && state.searchIndex >= 0) {
+              // 优先滚动到楼层高亮（如果存在）
+              var floorHighlight = els.content.querySelector(
+                ".message.floor-highlight",
+              );
+              if (floorHighlight) {
+                floorHighlight.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+                return;
+              }
+              var firstMark = els.content.querySelector(".search-highlight");
+              if (firstMark) {
+                firstMark.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
+                return;
+              }
+            }
+            // 否则滚动到顶部
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }
+
+        // ===== 16. 消息内容处理（保留） =====
+        function processMessageContent(text) {
+          var safe = escapeHtml(text);
+          safe = safe.replace(/"([^"]+)"/g, "<q>$1</q>");
+          safe = safe.replace(/“([^”]*)”/g, "<q>$1</q>");
+          safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
+          safe = safe.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+          safe = safe.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
+          safe = safe.replace(/~~(.+?)~~/g, "<del>$1</del>");
+          safe = safe.replace(/\n/g, "<br>");
+          return safe;
+        }
+
+        // ===== 17. Markdown 渲染器 =====
+        function getMarkdownRenderer() {
+          var renderer = new marked.Renderer();
+          renderer.code = function (code, lang) {
+            if (lang === "html") {
+              var encoded = encodeURIComponent(code)
+                .replace(/'/g, "%27")
+                .replace(/"/g, "%22");
+              return (
+                '<div class="html-block-wrapper"><iframe src="data:text/html;charset=utf-8,' +
+                encoded +
+                '" sandbox="allow-scripts allow-same-origin allow-modals" style="width:100%;border:none;background:#fff;height:200px;" onload="(function(el){function resize(){try{var doc=el.contentWindow.document;var h=doc.documentElement.scrollHeight||doc.body.scrollHeight||200;if(h>50)el.style.height=(h+20)+\'px\';}catch(e){el.style.height=\'800px\';}}resize();setTimeout(resize,500);setTimeout(resize,1500);})(this)"></iframe></div>'
+              );
+            }
+            var safe = code
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;");
+            return (
+              '<pre><code class="language-' +
+              (lang || "text") +
+              '">' +
+              safe +
+              "</code></pre>"
+            );
+          };
+          return renderer;
+        }
+
+        // ===== 18. 后处理：引号着色 + 搜索高亮（仅文本内容） =====
         function postProcessTextNodes(root, highlightQuery) {
-          const walker = document.createTreeWalker(
+          var walker = document.createTreeWalker(
             root,
             NodeFilter.SHOW_TEXT,
             null,
             false,
           );
-          const textNodes = [];
-          let node;
-          while ((node = walker.nextNode())) {
-            textNodes.push(node);
-          }
-          for (const textNode of textNodes) {
-            let text = textNode.textContent;
-            if (!text.trim()) continue;
-
-            let parts = [];
-            let lastIndex = 0;
-            const regex = /“([^”]*)”|"([^"]*)"/g;
-            let match;
-            let hasQuote = false;
+          var textNodes = [];
+          var node;
+          while ((node = walker.nextNode())) textNodes.push(node);
+          textNodes.forEach(function (textNode) {
+            var text = textNode.textContent;
+            if (!text.trim()) return;
+            var parts = [];
+            var lastIndex = 0;
+            var regex = /“([^”]*)”|"([^"]*)"/g;
+            var match;
+            var hasQuote = false;
             while ((match = regex.exec(text)) !== null) {
               hasQuote = true;
-              const content = match[1] || match[2] || "";
-              const fullMatch = match[0];
-              const startIndex = match.index;
-              const endIndex = startIndex + fullMatch.length;
-              if (startIndex > lastIndex) {
+              var content = match[1] || match[2] || "";
+              var full = match[0];
+              var start = match.index;
+              var end = start + full.length;
+              if (start > lastIndex)
                 parts.push({
                   type: "text",
-                  content: text.substring(lastIndex, startIndex),
+                  content: text.substring(lastIndex, start),
                 });
-              }
-              parts.push({ type: "quote", content: content, full: fullMatch });
-              lastIndex = endIndex;
+              parts.push({ type: "quote", content: content, full: full });
+              lastIndex = end;
             }
             if (!hasQuote) {
               if (highlightQuery && highlightQuery.trim()) {
-                const q = highlightQuery.trim();
-                const regexQ = new RegExp(
-                  "(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")",
-                  "gi",
-                );
-                const newText = text.replace(
+                var q = highlightQuery.trim();
+                var regexQ = new RegExp("(" + escapeRegex(q) + ")", "gi");
+                var newText = text.replace(
                   regexQ,
                   '<mark class="search-highlight">$1</mark>',
                 );
                 if (newText !== text) {
-                  const span = document.createElement("span");
+                  var span = document.createElement("span");
                   span.innerHTML = newText;
                   textNode.parentNode.replaceChild(span, textNode);
                 }
               }
-              continue;
+              return;
             }
-            if (lastIndex < text.length) {
+            if (lastIndex < text.length)
               parts.push({ type: "text", content: text.substring(lastIndex) });
-            }
-            const fragment = document.createDocumentFragment();
-            for (const part of parts) {
+            var frag = document.createDocumentFragment();
+            parts.forEach(function (part) {
               if (part.type === "text") {
-                let content = part.content;
+                var content2 = part.content;
                 if (highlightQuery && highlightQuery.trim()) {
-                  const q = highlightQuery.trim();
-                  const regexQ = new RegExp(
-                    "(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")",
-                    "gi",
-                  );
-                  content = content.replace(
-                    regexQ,
+                  var q2 = highlightQuery.trim();
+                  var regexQ2 = new RegExp("(" + escapeRegex(q2) + ")", "gi");
+                  content2 = content2.replace(
+                    regexQ2,
                     '<mark class="search-highlight">$1</mark>',
                   );
                 }
-                if (content) {
-                  const span = document.createElement("span");
-                  span.innerHTML = content;
-                  fragment.appendChild(span);
+                if (content2) {
+                  var span2 = document.createElement("span");
+                  span2.innerHTML = content2;
+                  frag.appendChild(span2);
                 }
-              } else if (part.type === "quote") {
-                let content = part.content;
+              } else {
+                var content3 = part.content;
                 if (highlightQuery && highlightQuery.trim()) {
-                  const q = highlightQuery.trim();
-                  const regexQ = new RegExp(
-                    "(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")",
-                    "gi",
-                  );
-                  content = content.replace(
-                    regexQ,
+                  var q3 = highlightQuery.trim();
+                  var regexQ3 = new RegExp("(" + escapeRegex(q3) + ")", "gi");
+                  content3 = content3.replace(
+                    regexQ3,
                     '<mark class="search-highlight">$1</mark>',
                   );
                 }
-                const quoteChar = part.full.charAt(0);
-                const endChar = part.full.charAt(part.full.length - 1);
-                const span = document.createElement("span");
-                span.className = "quote-text";
-                span.innerHTML = quoteChar + content + endChar;
-                fragment.appendChild(span);
+                var span3 = document.createElement("span");
+                span3.className = "quote-text";
+                span3.innerHTML =
+                  part.full.charAt(0) +
+                  content3 +
+                  part.full.charAt(part.full.length - 1);
+                frag.appendChild(span3);
               }
-            }
-            textNode.parentNode.replaceChild(fragment, textNode);
-          }
+            });
+            textNode.parentNode.replaceChild(frag, textNode);
+          });
         }
 
-        // ========== Markdown 渲染器 ==========
-        function getRenderer() {
-          const renderer = new marked.Renderer();
-          renderer.code = function (code, lang) {
-            if (lang === "html") {
-              const encoded = encodeURIComponent(code)
-                .replace(/'/g, "%27")
-                .replace(/"/g, "%22");
-              return `<div class="html-block-wrapper">
-                                    <iframe src="data:text/html;charset=utf-8,${encoded}" 
-                                            sandbox="allow-scripts allow-same-origin allow-modals"
-                                            style="width:100%; border:none; background:#fff; height:200px;"
-                                            onload="(function(el){
-                                                function resize() {
-                                                    try {
-                                                        var doc = el.contentWindow.document;
-                                                        var h = doc.documentElement.scrollHeight || doc.body.scrollHeight || 200;
-                                                        if (h > 50) el.style.height = (h + 20) + 'px';
-                                                    } catch(e) { el.style.height = '800px'; }
-                                                }
-                                                resize();
-                                                setTimeout(resize, 500);
-                                                setTimeout(resize, 1500);
-                                            })(this)">
-                                    </iframe>
-                                </div>`;
-            }
-            const safe = code
-              .replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;");
-            return `<pre><code class="language-${lang || "text"}">${safe}</code></pre>`;
-          };
-          return renderer;
-        }
-
-        // ========== 分页 ==========
-        function buildPages(tokens) {
-          if (pageSize === -1) return [tokens];
-          const size = pageSize;
-          const newPages = [];
-          for (let i = 0; i < tokens.length; i += size) {
-            newPages.push(tokens.slice(i, i + size));
-          }
-          return newPages;
-        }
-
-        // ========== 渲染页面 ==========
-        function renderPage(index) {
-          if (!pages.length) {
-            contentDiv.innerHTML =
-              '<p style="color:#666;padding:20px;">暂无内容，请先加载文件。</p>';
-            return;
-          }
-          if (index < 0) index = 0;
-          if (index >= pages.length) index = pages.length - 1;
-          currentPage = index;
-
-          const pageTokens = pages[currentPage];
-          const renderer = getRenderer();
-          let html = marked.parser(pageTokens, { renderer: renderer });
-          contentDiv.innerHTML = html;
-
-          postProcessTextNodes(contentDiv, currentSearchQuery);
-
-          const total = pages.length;
-          const infoText =
-            total === 1 && pageSize === -1
+        // ===== 19. 分页控制 =====
+        function updatePaginationUI() {
+          var total = state.pages.length;
+          var infoText =
+            total === 1 && state.pageSize === -1
               ? "无分页"
-              : `${currentPage + 1} / ${total}`;
-          pageInfo.textContent = infoText;
-          pageInfoB.textContent = infoText;
-          const disabledPrev = total <= 1 || currentPage === 0;
-          const disabledNext = total <= 1 || currentPage === total - 1;
-          prevBtn.disabled = disabledPrev;
-          nextBtn.disabled = disabledNext;
-          prevBtnB.disabled = disabledPrev;
-          nextBtnB.disabled = disabledNext;
-          jumpPage.value = currentPage + 1;
-          jumpPage.max = total;
-          jumpPageB.value = currentPage + 1;
-          jumpPageB.max = total;
-          totalBlocksSpan.textContent = allTokens.length;
-
-          if (searchMatches.length && searchIndex >= 0) {
-            setTimeout(() => {
-              const firstMark = contentDiv.querySelector(".search-highlight");
-              if (firstMark)
-                firstMark.scrollIntoView({
-                  behavior: "smooth",
-                  block: "center",
-                });
-            }, 100);
-          }
+              : state.currentPage + " / " + total;
+          els.pageInfo.textContent = infoText;
+          els.pageInfoBottom.textContent = infoText;
+          els.totalBlocks.textContent = state.isJsonlChat
+            ? state.chats[state.currentChatId] &&
+              state.chats[state.currentChatId].messages
+              ? state.chats[state.currentChatId].messages.length
+              : 0
+            : state.chats[state.currentChatId] &&
+                state.chats[state.currentChatId].tokens
+              ? state.chats[state.currentChatId].tokens.length
+              : 0;
+          updatePaginationButtons();
         }
 
-        // ========== 加载文件（分块解析） ==========
-        function loadFile(file) {
-          if (!file) return;
-          setStatus(`📂 读取中: ${file.name} ...`, "");
-          const reader = new FileReader();
-          reader.onload = function (ev) {
-            try {
-              const fullText = ev.target.result;
-              setStatus("⚙️ 正在分词 & 分页 ... (分块处理中)", "");
-
-              const CHUNK_SIZE = 300 * 1024; // 300KB
-              const totalLength = fullText.length;
-              let offset = 0;
-              let allTokensAccum = [];
-
-              function processNextChunk() {
-                if (offset >= totalLength) {
-                  if (!allTokensAccum.length) {
-                    setStatus("⚠️ 文件为空或格式无效", "error");
-                    return;
-                  }
-                  allTokens = allTokensAccum;
-                  pages = buildPages(allTokens);
-                  searchMatches = [];
-                  searchIndex = -1;
-                  currentSearchQuery = "";
-                  searchResult.textContent = "";
-                  searchPrev.style.display = "none";
-                  searchNext.style.display = "none";
-                  renderPage(0);
-                  setStatus(
-                    `✅ 加载成功！共 ${allTokens.length} 个块，分 ${pages.length} 页`,
-                    "success",
-                  );
-                  return;
-                }
-                let end = Math.min(offset + CHUNK_SIZE, totalLength);
-                if (end < totalLength) {
-                  let newlineIndex = fullText.indexOf("\n", end);
-                  if (newlineIndex !== -1 && newlineIndex - end < 1000) {
-                    end = newlineIndex + 1;
-                  }
-                }
-                const chunkText = fullText.substring(offset, end);
-                offset = end;
-                let chunkTokens;
-                try {
-                  chunkTokens = marked.lexer(chunkText);
-                } catch (e) {
-                  setStatus(`❌ 解析块失败: ${e.message}`, "error");
-                  return;
-                }
-                allTokensAccum = allTokensAccum.concat(chunkTokens);
-                const progress = Math.min(
-                  100,
-                  Math.round((offset / totalLength) * 100),
-                );
-                setStatus(`⚙️ 解析中 ${progress}%`, "");
-                setTimeout(processNextChunk, 50);
-              }
-              processNextChunk();
-            } catch (err) {
-              setStatus(`❌ 渲染失败: ${err.message}`, "error");
-              console.error(err);
-            }
-          };
-          reader.onerror = () => setStatus("❌ 文件读取失败", "error");
-          reader.readAsText(file, "UTF-8");
+        function updatePaginationButtons() {
+          var total = state.pages.length;
+          var disabledPrev = total <= 1 || state.currentPage <= 1;
+          var disabledNext = total <= 1 || state.currentPage >= total;
+          els.prevPage.disabled = disabledPrev;
+          els.nextPage.disabled = disabledNext;
+          els.prevPageBottom.disabled = disabledPrev;
+          els.nextPageBottom.disabled = disabledNext;
+          els.jumpPage.value = state.currentPage;
+          els.jumpPage.max = total;
+          els.jumpPageBottom.value = state.currentPage;
+          els.jumpPageBottom.max = total;
         }
 
-        fileInput.addEventListener("change", function (e) {
-          if (e.target.files[0]) loadFile(e.target.files[0]);
-        });
-
-        // ========== 翻页 ==========
         function goToPage(p) {
-          if (p < 0) p = 0;
-          if (p >= pages.length) p = pages.length - 1;
-          renderPage(p);
+          if (p < 1) p = 1;
+          if (p > state.pages.length) p = state.pages.length;
+          state.currentPage = p;
+          renderCurrentPage(false);
         }
 
-        function bindPagination(btnPrev, btnNext) {
-          btnPrev.addEventListener("click", () => {
-            if (currentPage > 0) goToPage(currentPage - 1);
-          });
-          btnNext.addEventListener("click", () => {
-            if (currentPage < pages.length - 1) goToPage(currentPage + 1);
-          });
+        function changePage(delta) {
+          var newPage = state.currentPage + delta;
+          if (newPage >= 1 && newPage <= state.pages.length) {
+            goToPage(newPage);
+          }
         }
-        bindPagination(prevBtn, nextBtn);
-        bindPagination(prevBtnB, nextBtnB);
+        els.prevPage.addEventListener("click", function () {
+          changePage(-1);
+        });
+        els.nextPage.addEventListener("click", function () {
+          changePage(1);
+        });
+        els.prevPageBottom.addEventListener("click", function () {
+          changePage(-1);
+        });
+        els.nextPageBottom.addEventListener("click", function () {
+          changePage(1);
+        });
 
-        function jumpHandler() {
-          let p = parseInt(jumpPage.value);
+        function jumpHandler(source) {
+          var input = source === "bottom" ? els.jumpPageBottom : els.jumpPage;
+          var p = parseInt(input.value);
           if (isNaN(p)) return;
-          p = Math.max(1, Math.min(p, pages.length));
-          goToPage(p - 1);
+          p = Math.max(1, Math.min(p, state.pages.length));
+          goToPage(p);
         }
-        jumpBtn.addEventListener("click", jumpHandler);
-        jumpPage.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") jumpHandler();
+        els.jumpBtn.addEventListener("click", function () {
+          jumpHandler("top");
         });
-        jumpBtnB.addEventListener("click", jumpHandler);
-        jumpPageB.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") jumpHandler();
+        els.jumpPage.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") jumpHandler("top");
+        });
+        els.jumpBtnBottom.addEventListener("click", function () {
+          jumpHandler("bottom");
+        });
+        els.jumpPageBottom.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") jumpHandler("bottom");
         });
 
-        // ========== 每页数量切换（修复无反应问题） ==========
-        pageSizeSelect.addEventListener("change", function () {
-          const val = parseInt(this.value);
-          pageSize = val === -1 ? -1 : val;
-          if (allTokens && allTokens.length) {
-            pages = buildPages(allTokens);
-            currentPage = 0;
-            renderPage(0);
-          } else {
-            // 若尚未加载文件，仅保存设置，待加载后生效
-            console.log("每页大小已设为", pageSize);
+        // 自定义每页条数
+        function applyPageSize() {
+          var val = parseInt(els.pageSizeInput.value);
+          if (isNaN(val)) return;
+          state.pageSize = val;
+          if (state.currentChatId) {
+            if (state.isJsonlChat) buildJsonlPages();
+            else buildTokenPages();
+            state.currentPage = 1;
+            renderCurrentPage(false);
           }
-        });
-
-        // ========== 搜索 ==========
-        function extractText(tokens) {
-          let text = "";
-          for (const t of tokens) {
-            if (t.text) text += t.text + " ";
-            if (t.tokens) text += extractText(t.tokens) + " ";
-            if (t.type === "heading" && t.text) text += t.text + " ";
-            if (t.type === "list" && t.items) {
-              for (const item of t.items) {
-                text += extractText(item.tokens || []) + " ";
-              }
-            }
-          }
-          return text.trim();
+          // 更新显示
+          els.pageSizeInput.value = val;
         }
+        els.pageSizeInput.addEventListener("change", applyPageSize);
+        els.pageSizeInput.addEventListener("blur", applyPageSize);
 
-        function clearSearch() {
-          searchInput.value = "";
-          currentSearchQuery = "";
-          searchMatches = [];
-          searchIndex = -1;
-          searchResult.textContent = "";
-          searchPrev.style.display = "none";
-          searchNext.style.display = "none";
-          searchClear.style.display = "none";
-          renderPage(currentPage);
-          ignoreScrollHide = false;
-        }
-
+        // ===== 20. 搜索 =====
         function performSearch(query) {
-          currentSearchQuery = query.trim();
-          searchMatches = [];
-          searchIndex = -1;
-          searchPrev.style.display = "none";
-          searchNext.style.display = "none";
-          if (currentSearchQuery) searchClear.style.display = "inline-block";
-          else searchClear.style.display = "none";
-          if (!currentSearchQuery || !pages.length) {
-            searchResult.textContent = "";
-            renderPage(currentPage);
-            ignoreScrollHide = false;
-            return;
-          }
-          ignoreScrollHide = true;
-          showToolbar();
+          state.currentSearchQuery = query.trim();
+          state.searchMatches = [];
+          state.searchIndex = -1;
+          els.searchPrev.style.display = "none";
+          els.searchNext.style.display = "none";
+          els.searchClear.style.display = state.currentSearchQuery
+            ? "inline-block"
+            : "none";
 
-          const q = currentSearchQuery.toLowerCase();
-          for (let i = 0; i < pages.length; i++) {
-            const pageText = extractText(pages[i]).toLowerCase();
-            if (pageText.includes(q)) {
-              searchMatches.push(i);
-            }
-          }
-          if (searchMatches.length === 0) {
-            searchResult.textContent = "未找到匹配";
-            renderPage(currentPage);
-            setTimeout(() => {
-              ignoreScrollHide = false;
-            }, 3000);
+          if (!state.currentSearchQuery || !state.pages.length) {
+            els.searchResult.textContent = "";
+            // 清空搜索时，不滚动（传入true）
+            renderCurrentPage(true);
+            ignoreScrollHide = false;
             return;
           }
-          searchResult.textContent = `找到 ${searchMatches.length} 页`;
-          searchPrev.style.display = "inline-block";
-          searchNext.style.display = "inline-block";
-          searchIndex = 0;
-          renderPage(searchMatches[searchIndex]);
-          searchResult.textContent = `找到 ${searchMatches.length} 页 (${searchIndex + 1}/${searchMatches.length})`;
-          setTimeout(() => {
-            ignoreScrollHide = false;
-          }, 2000);
+          var q = state.currentSearchQuery.toLowerCase();
+          var matches = [];
+          state.pages.forEach(function (page, idx) {
+            var text = "";
+            if (state.isJsonlChat) {
+              var allMessages = state.chats[state.currentChatId].messages;
+              var startIdx = allMessages.indexOf(page[0]);
+              if (startIdx === -1) startIdx = 0;
+              page.forEach(function (msg, mi) {
+                text += (msg.mes || "") + " ";
+                var floor =
+                  msg.message_id !== undefined &&
+                  msg.message_id !== null &&
+                  msg.message_id !== ""
+                    ? msg.message_id
+                    : msg.id !== undefined && msg.id !== null && msg.id !== ""
+                      ? msg.id
+                      : startIdx + mi;
+                text += "#" + floor + " ";
+              });
+            } else {
+              text = extractTextFromTokens(page);
+            }
+            if (text.toLowerCase().indexOf(q) !== -1) matches.push(idx);
+          });
+          state.searchMatches = matches;
+          if (matches.length === 0) {
+            els.searchResult.textContent = "未找到";
+            renderCurrentPage(false);
+            return;
+          }
+          els.searchResult.textContent = "找到 " + matches.length + " 页";
+          els.searchPrev.style.display = "inline-block";
+          els.searchNext.style.display = "inline-block";
+          state.searchIndex = 0;
+          goToPage(matches[0] + 1);
+          els.searchResult.textContent =
+            "找到 " +
+            matches.length +
+            " 页 (" +
+            (state.searchIndex + 1) +
+            "/" +
+            matches.length +
+            ")";
+        }
+
+        function extractTextFromTokens(tokens) {
+          var text = "";
+          var traverse = function (arr) {
+            arr.forEach(function (t) {
+              if (t.text) text += t.text + " ";
+              if (t.tokens) traverse(t.tokens);
+              if (t.type === "heading" && t.text) text += t.text + " ";
+              if (t.type === "list" && t.items) {
+                t.items.forEach(function (item) {
+                  if (item.tokens) traverse(item.tokens);
+                });
+              }
+            });
+          };
+          traverse(tokens);
+          return text;
         }
 
         function navigateSearch(delta) {
-          if (!searchMatches.length) return;
+          if (!state.searchMatches.length) return;
           ignoreScrollHide = true;
           showToolbar();
-          searchIndex =
-            (searchIndex + delta + searchMatches.length) % searchMatches.length;
-          renderPage(searchMatches[searchIndex]);
-          searchResult.textContent = `找到 ${searchMatches.length} 页 (${searchIndex + 1}/${searchMatches.length})`;
-          if (window.navigateTimer) clearTimeout(window.navigateTimer);
-          window.navigateTimer = setTimeout(() => {
+          state.searchIndex =
+            (state.searchIndex + delta + state.searchMatches.length) %
+            state.searchMatches.length;
+          goToPage(state.searchMatches[state.searchIndex] + 1);
+          els.searchResult.textContent =
+            "找到 " +
+            state.searchMatches.length +
+            " 页 (" +
+            (state.searchIndex + 1) +
+            "/" +
+            state.searchMatches.length +
+            ")";
+          if (window.searchTimer) clearTimeout(window.searchTimer);
+          window.searchTimer = setTimeout(function () {
             ignoreScrollHide = false;
-          }, 1500);
+          }, 2000);
+        }
+        els.searchBtn.addEventListener("click", function () {
+          performSearch(els.searchInput.value);
+        });
+        els.searchInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") performSearch(els.searchInput.value);
+          if (els.searchInput.value.length > 0)
+            els.searchClear.style.display = "inline-block";
+          else els.searchClear.style.display = "none";
+        });
+        els.searchInput.addEventListener("input", function () {
+          this.value.length > 0
+            ? (els.searchClear.style.display = "inline-block")
+            : (els.searchClear.style.display = "none");
+        });
+        els.searchNext.addEventListener("click", function () {
+          navigateSearch(1);
+        });
+        els.searchPrev.addEventListener("click", function () {
+          navigateSearch(-1);
+        });
+        els.searchClear.addEventListener("click", function () {
+          els.searchInput.value = "";
+          els.searchClear.style.display = "none";
+          performSearch("");
+        });
+
+        // ===== 21. 收藏功能 =====
+        window.toggleBookmark = function (page, index) {
+          var chatId = state.currentChatId;
+          var existingIdx = state.bookmarks.findIndex(function (b) {
+            return (
+              b.chatId === chatId && b.page === page && b.messageIndex === index
+            );
+          });
+          if (existingIdx > -1) {
+            if (confirm("取消收藏？")) {
+              state.bookmarks.splice(existingIdx, 1);
+              saveSettings();
+              renderBookmarkList();
+              renderCurrentPage(false);
+              setStatus("已取消收藏", "success");
+            }
+            return;
+          }
+          var pageData = state.pages[page - 1];
+          if (!pageData) return;
+          var msg = pageData[index];
+          if (!msg) return;
+          var sender = msg.name || (msg.is_user ? "User" : "Char");
+          var content = msg.mes || "";
+          var note = prompt("添加批注（可选）：");
+          if (note === null) return;
+          state.bookmarks.push({
+            id: Date.now().toString(),
+            chatId: chatId,
+            page: page,
+            messageIndex: index,
+            senderName: sender,
+            content: content.substring(0, 200),
+            note: note || "",
+            timestamp: Date.now(),
+          });
+          saveSettings();
+          renderBookmarkList();
+          renderCurrentPage(false);
+          setStatus("已收藏", "success");
+        };
+
+        function renderBookmarkList() {
+          els.bookmarkCount.textContent = state.bookmarks.length;
+          if (state.bookmarks.length === 0) {
+            els.bookmarkList.innerHTML =
+              '<li class="empty-state" style="color:#666;">暂无收藏</li>';
+            return;
+          }
+          var sorted = state.bookmarks.slice().sort(function (a, b) {
+            return b.timestamp - a.timestamp;
+          });
+          els.bookmarkList.innerHTML = sorted
+            .map(function (b) {
+              var chat = state.chats[b.chatId];
+              var chatName = chat ? chat.name : "已删除";
+              return (
+                "<li onclick=\"jumpToBookmark('" +
+                b.id +
+                "')\">" +
+                '<div class="bookmark-info">' +
+                '<div class="bookmark-title">' +
+                escapeHtml(chatName) +
+                " · P" +
+                b.page +
+                "</div>" +
+                '<div class="bookmark-meta">' +
+                escapeHtml(b.senderName) +
+                "</div>" +
+                (b.note
+                  ? '<div style="font-size:0.75rem;color:#ffaa00;">📝 ' +
+                    escapeHtml(b.note) +
+                    "</div>"
+                  : "") +
+                "</div>" +
+                '<button class="delete-btn" onclick="event.stopPropagation(); deleteBookmarkItem(\'' +
+                b.id +
+                "')\">🗑️</button>" +
+                "</li>"
+              );
+            })
+            .join("");
         }
 
-        searchBtn.addEventListener("click", () =>
-          performSearch(searchInput.value),
-        );
-        searchInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") performSearch(searchInput.value);
-          if (searchInput.value.length > 0)
-            searchClear.style.display = "inline-block";
-          else searchClear.style.display = "none";
+        window.jumpToBookmark = function (id) {
+          var b = state.bookmarks.find(function (b) {
+            return b.id === id;
+          });
+          if (!b) return;
+          if (!state.chats[b.chatId]) {
+            alert("聊天已删除");
+            deleteBookmarkItem(id);
+            return;
+          }
+          state.currentChatId = b.chatId;
+          var chat = state.chats[b.chatId];
+          if (
+            chat.messages &&
+            chat.messages.length > 0 &&
+            chat.messages[0].mes !== undefined
+          ) {
+            state.isJsonlChat = true;
+            buildJsonlPages();
+          } else {
+            state.isJsonlChat = false;
+            buildTokenPages();
+          }
+          if (b.page <= state.pages.length) {
+            goToPage(b.page);
+            setTimeout(function () {
+              var msgs = els.content.querySelectorAll(".message");
+              if (msgs[b.messageIndex]) {
+                msgs[b.messageIndex].classList.add("highlight-message");
+                msgs[b.messageIndex].scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
+                setTimeout(function () {
+                  msgs[b.messageIndex].classList.remove("highlight-message");
+                }, 3000);
+              }
+            }, 100);
+          }
+          renderChatList();
+          renderBookmarkList();
+          toggleSidebar(false);
+        };
+
+        function deleteBookmarkItem(id) {
+          state.bookmarks = state.bookmarks.filter(function (b) {
+            return b.id !== id;
+          });
+          saveSettings();
+          renderBookmarkList();
+          if (state.currentChatId) renderCurrentPage(false);
+        }
+
+        // ===== 22. 文件导入 =====
+        function handleFiles(files) {
+          var promises = [];
+          for (var i = 0; i < files.length; i++) {
+            (function (file) {
+              promises.push(
+                new Promise(function (resolve, reject) {
+                  var reader = new FileReader();
+                  reader.onload = function (e) {
+                    try {
+                      var text = e.target.result;
+                      var ext = file.name.split(".").pop().toLowerCase();
+                      if (ext === "jsonl") {
+                        importJsonl(text, file.name)
+                          .then(resolve)
+                          .catch(reject);
+                      } else if (ext === "txt" || ext === "md") {
+                        importText(text, file.name).then(resolve).catch(reject);
+                      } else {
+                        reject("不支持的文件类型: " + ext);
+                      }
+                    } catch (err) {
+                      reject(err);
+                    }
+                  };
+                  reader.onerror = function () {
+                    reject(reader.error);
+                  };
+                  reader.readAsText(file);
+                }),
+              );
+            })(files[i]);
+          }
+          Promise.all(promises)
+            .then(function () {
+              renderChatList();
+              updateCacheStatus();
+              var ids = Object.keys(state.chats);
+              if (ids.length > 0 && !state.currentChatId) {
+                selectChat(ids[ids.length - 1]);
+              }
+              setStatus("✅ 导入完成", "success");
+            })
+            .catch(function (err) {
+              setStatus("❌ 导入失败: " + err, "error");
+              console.error(err);
+            });
+        }
+
+        function importJsonl(text, filename) {
+          return new Promise(function (resolve, reject) {
+            var lines = text
+              .trim()
+              .split("\n")
+              .filter(function (l) {
+                return l.trim();
+              });
+            var messages = [];
+            var chatMeta = null;
+            for (var i = 0; i < lines.length; i++) {
+              try {
+                var obj = JSON.parse(lines[i]);
+                if (obj.chat_metadata) {
+                  chatMeta = obj.chat_metadata;
+                } else if (obj.mes !== undefined || obj.message !== undefined) {
+                  var msg = {
+                    message_id: obj.message_id || obj.id || null,
+                    name: obj.name || (obj.is_user ? "User" : "Char"),
+                    is_user: obj.is_user || obj.role === "user",
+                    mes: obj.mes || obj.message || "",
+                    send_date: obj.send_date || null,
+                  };
+                  messages.push(msg);
+                }
+              } catch (_) {
+                /* ignore */
+              }
+            }
+            if (messages.length === 0) {
+              reject("未解析到有效消息");
+              return;
+            }
+            var charName =
+              messages.find(function (m) {
+                return !m.is_user;
+              })?.name || "未知角色";
+            var chatId = generateHash(
+              filename + (messages[0]?.message_id || messages[0]?.id || ""),
+            );
+            var chatData = {
+              name: charName,
+              file: filename,
+              messages: messages,
+              metadata: chatMeta,
+              isJsonl: true,
+            };
+            state.chats[chatId] = chatData;
+            saveChat(chatId, chatData).then(resolve).catch(reject);
+          });
+        }
+
+        function importText(text, filename) {
+          return new Promise(function (resolve, reject) {
+            var tokens;
+            try {
+              tokens = marked.lexer(text);
+            } catch (e) {
+              reject("Markdown解析失败: " + e.message);
+              return;
+            }
+            if (!tokens || tokens.length === 0) {
+              reject("文件内容为空");
+              return;
+            }
+            var chatId = generateHash(filename + text.length);
+            var chatData = {
+              name: filename.replace(/\.[^.]+$/, ""),
+              file: filename,
+              tokens: tokens,
+              isJsonl: false,
+            };
+            state.chats[chatId] = chatData;
+            saveChat(chatId, chatData).then(resolve).catch(reject);
+          });
+        }
+
+        els.fileInput.addEventListener("change", function (e) {
+          if (this.files.length) handleFiles(Array.from(this.files));
+          this.value = "";
         });
-        searchInput.addEventListener("input", function () {
-          this.value.length > 0
-            ? (searchClear.style.display = "inline-block")
-            : (searchClear.style.display = "none");
+        els.uploadZone.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          els.uploadZone.classList.add("dragover");
         });
-        searchNext.addEventListener("click", () => navigateSearch(1));
-        searchPrev.addEventListener("click", () => navigateSearch(-1));
-        searchClear.addEventListener("click", function () {
-          clearSearch();
-          searchInput.value = "";
-          this.style.display = "none";
-          ignoreScrollHide = false;
+        els.uploadZone.addEventListener("dragleave", function () {
+          els.uploadZone.classList.remove("dragover");
+        });
+        els.uploadZone.addEventListener("drop", function (e) {
+          e.preventDefault();
+          els.uploadZone.classList.remove("dragover");
+          var files = Array.from(e.dataTransfer.files);
+          if (files.length) handleFiles(files);
+        });
+        els.uploadZone.addEventListener("click", function () {
+          els.fileInput.click();
         });
 
-        // ========== 回到顶部 ==========
-        document.getElementById("backToTop").addEventListener("click", () => {
+        // ===== 23. 清空所有聊天 =====
+        window.clearAllChats = function () {
+          if (!confirm("确定清空所有缓存？")) return;
+          clearAllChatsDB();
+          state.chats = {};
+          state.currentChatId = null;
+          state.pages = [];
+          els.content.innerHTML =
+            '<div class="welcome-page"><div class="icon">📖</div><h2>请选择聊天记录</h2></div>';
+          renderChatList();
+          renderBookmarkList();
+          updateCacheStatus();
+          setStatus("已清空", "success");
+        };
+
+        // ===== 24. 回顶回底 =====
+        els.backToTop.addEventListener("click", function () {
           window.scrollTo({ top: 0, behavior: "smooth" });
         });
-
-        // ========== 拖拽支持 ==========
-        document.body.addEventListener("dragover", (e) => {
-          e.preventDefault();
+        els.backToBottom.addEventListener("click", function () {
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: "smooth",
+          });
         });
-        document.body.addEventListener("drop", (e) => {
-          e.preventDefault();
-          const files = e.dataTransfer.files;
+
+        // ===== 25. 设置面板功能 =====
+
+        // 25.1 样式控件
+        [
+          els.bgColor,
+          els.textColor,
+          els.quoteColor,
+          els.italicColor,
+          els.codeBg,
+          els.userBgColor,
+          els.charBgColor,
+        ].forEach(function (el) {
+          el.addEventListener("input", function () {
+            applyStyles();
+          });
+        });
+        els.fontSizeRange.addEventListener("input", function () {
+          applyStyles();
+        });
+        els.lineHeightRange.addEventListener("input", function () {
+          applyStyles();
+        });
+
+        // ===== 25.2 预设管理 =====
+        function loadPresets() {
+          var defaultPreset = {
+            id: "default",
+            name: "默认暗色",
+            bg: "#1a1a1a",
+            text: "#e0e0e0",
+            quote: "#ffaa88",
+            italic: "#d0b0ff",
+            codeBg: "#2d2d2d",
+            userBg: "#2d4a3e",
+            charBg: "#3d2a4a",
+            fontSize: 16,
+            lineHeight: 1.7,
+          };
+          var presets = JSON.parse(localStorage.getItem("st_presets"));
+          if (!presets) {
+            presets = [defaultPreset];
+            localStorage.setItem("st_presets", JSON.stringify(presets));
+          }
+          state.presets = presets;
+          var activeId = localStorage.getItem("st_activePreset") || "default";
           if (
-            files.length &&
-            (files[0].name.endsWith(".txt") || files[0].name.endsWith(".md"))
+            !presets.find(function (p) {
+              return p.id === activeId;
+            })
+          )
+            activeId = presets[0].id;
+          state.activePresetId = activeId;
+          renderPresetSelect();
+          applyPreset(activeId);
+        }
+
+        function renderPresetSelect() {
+          var select = els.presetSelect;
+          select.innerHTML = "";
+          state.presets.forEach(function (p) {
+            var opt = document.createElement("option");
+            opt.value = p.id;
+            opt.textContent = p.name;
+            if (p.id === state.activePresetId) opt.selected = true;
+            select.appendChild(opt);
+          });
+        }
+
+        function applyPreset(id) {
+          var preset = state.presets.find(function (p) {
+            return p.id === id;
+          });
+          if (!preset) return;
+          state.activePresetId = id;
+          localStorage.setItem("st_activePreset", id);
+          els.bgColor.value = preset.bg;
+          els.textColor.value = preset.text;
+          els.quoteColor.value = preset.quote;
+          els.italicColor.value = preset.italic;
+          els.codeBg.value = preset.codeBg;
+          els.userBgColor.value = preset.userBg || "#2d4a3e";
+          els.charBgColor.value = preset.charBg || "#3d2a4a";
+          els.fontSizeRange.value = preset.fontSize;
+          els.lineHeightRange.value = preset.lineHeight;
+          applyStyles();
+          renderPresetSelect();
+        }
+
+        els.presetSelect.addEventListener("change", function () {
+          applyPreset(this.value);
+        });
+
+        els.addPresetBtn.addEventListener("click", function () {
+          var name = prompt("请输入新预设的名称：");
+          if (!name) return;
+          if (
+            state.presets.some(function (p) {
+              return p.name === name;
+            })
           ) {
-            loadFile(files[0]);
-            const dt = new DataTransfer();
-            dt.items.add(files[0]);
-            fileInput.files = dt.files;
+            setStatus("⚠️ 已存在同名预设", "error");
+            return;
+          }
+          var newPreset = {
+            id: "preset_" + Date.now(),
+            name: name,
+            bg: els.bgColor.value,
+            text: els.textColor.value,
+            quote: els.quoteColor.value,
+            italic: els.italicColor.value,
+            codeBg: els.codeBg.value,
+            userBg: els.userBgColor.value,
+            charBg: els.charBgColor.value,
+            fontSize: parseInt(els.fontSizeRange.value),
+            lineHeight: parseFloat(els.lineHeightRange.value),
+          };
+          state.presets.push(newPreset);
+          localStorage.setItem("st_presets", JSON.stringify(state.presets));
+          state.activePresetId = newPreset.id;
+          localStorage.setItem("st_activePreset", newPreset.id);
+          renderPresetSelect();
+          applyPreset(newPreset.id);
+          setStatus("✅ 预设已添加: " + name, "success");
+        });
+
+        els.savePresetBtn.addEventListener("click", function () {
+          var id = state.activePresetId;
+          var preset = state.presets.find(function (p) {
+            return p.id === id;
+          });
+          if (!preset) {
+            setStatus("⚠️ 请先选择一个预设", "error");
+            return;
+          }
+          if (id === "default") {
+            preset.bg = els.bgColor.value;
+            preset.text = els.textColor.value;
+            preset.quote = els.quoteColor.value;
+            preset.italic = els.italicColor.value;
+            preset.codeBg = els.codeBg.value;
+            preset.userBg = els.userBgColor.value;
+            preset.charBg = els.charBgColor.value;
+            preset.fontSize = parseInt(els.fontSizeRange.value);
+            preset.lineHeight = parseFloat(els.lineHeightRange.value);
+            localStorage.setItem("st_presets", JSON.stringify(state.presets));
+            setStatus("✅ 默认预设已更新", "success");
+            return;
+          }
+          var overwrite = confirm(
+            '确定将当前样式保存到预设 "' + preset.name + '" ？',
+          );
+          if (!overwrite) return;
+          preset.bg = els.bgColor.value;
+          preset.text = els.textColor.value;
+          preset.quote = els.quoteColor.value;
+          preset.italic = els.italicColor.value;
+          preset.codeBg = els.codeBg.value;
+          preset.userBg = els.userBgColor.value;
+          preset.charBg = els.charBgColor.value;
+          preset.fontSize = parseInt(els.fontSizeRange.value);
+          preset.lineHeight = parseFloat(els.lineHeightRange.value);
+          localStorage.setItem("st_presets", JSON.stringify(state.presets));
+          renderPresetSelect();
+          setStatus("✅ 预设已保存: " + preset.name, "success");
+        });
+
+        els.deletePresetBtn.addEventListener("click", function () {
+          var id = state.activePresetId;
+          if (id === "default") {
+            setStatus("默认预设不可删除", "error");
+            return;
+          }
+          var preset = state.presets.find(function (p) {
+            return p.id === id;
+          });
+          if (!preset) return;
+          if (!confirm('确定删除预设 "' + preset.name + '" ？')) return;
+          state.presets = state.presets.filter(function (p) {
+            return p.id !== id;
+          });
+          localStorage.setItem("st_presets", JSON.stringify(state.presets));
+          state.activePresetId = "default";
+          localStorage.setItem("st_activePreset", "default");
+          applyPreset("default");
+          setStatus("已删除预设: " + preset.name, "success");
+        });
+
+        // ===== 25.3 标签提取/排除 =====
+        function addTagToList(list, inputEl, containerEl, detectedArea) {
+          var val = inputEl.value.trim();
+          if (!val) return;
+          if (list.indexOf(val) === -1) {
+            list.push(val);
+            inputEl.value = "";
+            renderTagList(list, containerEl);
+            saveSettings();
+            if (detectedArea) detectedArea.style.display = "none";
           } else {
-            setStatus("⚠️ 请拖入 .txt 或 .md 文件", "error");
+            setStatus("标签已存在", "error");
+          }
+        }
+
+        function removeTag(list, tag, containerEl) {
+          var idx = list.indexOf(tag);
+          if (idx > -1) list.splice(idx, 1);
+          renderTagList(list, containerEl);
+          saveSettings();
+        }
+
+        function renderTagList(list, container) {
+          if (list.length === 0) {
+            container.innerHTML = "";
+            return;
+          }
+          container.innerHTML = list
+            .map(function (tag) {
+              return (
+                '<span class="tag-chip"><span>' +
+                escapeHtml(tag) +
+                '</span><span class="remove" onclick="removeTagFromList(\'' +
+                escapeHtml(tag) +
+                "')\">✕</span></span>"
+              );
+            })
+            .join("");
+        }
+
+        window.removeTagFromList = function (tag) {
+          if (state.extractTags.indexOf(tag) !== -1) {
+            removeTag(state.extractTags, tag, els.extractTagList);
+          } else if (state.excludeTags.indexOf(tag) !== -1) {
+            removeTag(state.excludeTags, tag, els.excludeTagList);
+          }
+        };
+
+        els.extractAddBtn.addEventListener("click", function () {
+          addTagToList(
+            state.extractTags,
+            els.extractInput,
+            els.extractTagList,
+            els.extractDetectedArea,
+          );
+        });
+        els.extractInput.addEventListener("keydown", function (e) {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            els.extractAddBtn.click();
           }
         });
 
-        contentDiv.innerHTML =
-          '<p style="color:#666;padding:20px;">📂 点击「选择文件」或直接拖入 .txt/.md 聊天记录</p>';
-      });
+        els.extractScanBtn.addEventListener("click", function () {
+          if (!state.currentChatId) {
+            setStatus("请先选择聊天", "error");
+            return;
+          }
+          var chat = state.chats[state.currentChatId];
+          if (!chat || !chat.messages) {
+            setStatus("当前聊天不支持扫描", "error");
+            return;
+          }
+          var tags = scanTags(chat.messages);
+          state.scanResults.extract = tags;
+          renderScanResults("extract");
+        });
+
+        function renderScanResults(type) {
+          var area =
+            type === "extract"
+              ? els.extractDetectedArea
+              : els.excludeDetectedArea;
+          var tags =
+            type === "extract"
+              ? state.scanResults.extract
+              : state.scanResults.exclude;
+          if (!tags || tags.length === 0) {
+            area.innerHTML =
+              '<span style="color:#888;">未检测到自定义标签</span>';
+          } else {
+            area.innerHTML = tags
+              .map(function (t) {
+                return (
+                  '<span class="tag-chip" style="cursor:pointer;" onclick="' +
+                  (type === "extract" ? "addExtractTag" : "addExcludeTag") +
+                  "('" +
+                  escapeHtml(t) +
+                  "')\">" +
+                  escapeHtml(t) +
+                  " ➕</span>"
+                );
+              })
+              .join(" ");
+          }
+          area.style.display = "block";
+        }
+
+        window.addExtractTag = function (tag) {
+          if (state.extractTags.indexOf(tag) === -1) {
+            state.extractTags.push(tag);
+            renderTagList(state.extractTags, els.extractTagList);
+            saveSettings();
+            setStatus("已添加提取标签: " + tag, "success");
+          }
+        };
+
+        els.excludeAddBtn.addEventListener("click", function () {
+          addTagToList(
+            state.excludeTags,
+            els.excludeInput,
+            els.excludeTagList,
+            els.excludeDetectedArea,
+          );
+        });
+        els.excludeInput.addEventListener("keydown", function (e) {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            els.excludeAddBtn.click();
+          }
+        });
+
+        els.excludeScanBtn.addEventListener("click", function () {
+          if (!state.currentChatId) {
+            setStatus("请先选择聊天", "error");
+            return;
+          }
+          var chat = state.chats[state.currentChatId];
+          if (!chat || !chat.messages) {
+            setStatus("当前聊天不支持扫描", "error");
+            return;
+          }
+          var tags = scanTags(chat.messages);
+          state.scanResults.exclude = tags;
+          renderScanResults("exclude");
+        });
+
+        window.addExcludeTag = function (tag) {
+          if (state.excludeTags.indexOf(tag) === -1) {
+            state.excludeTags.push(tag);
+            renderTagList(state.excludeTags, els.excludeTagList);
+            saveSettings();
+            setStatus("已添加排除标签: " + tag, "success");
+          }
+        };
+
+        els.extractEnable.addEventListener("change", function () {
+          state.settings.extractEnabled = this.checked;
+          saveSettings();
+          if (state.currentChatId) renderCurrentPage(false);
+        });
+
+        // ===== 25.4 正则替换 =====
+        function renderRegexRules() {
+          els.regexRulesContainer.innerHTML = state.regexRules
+            .map(function (rule, idx) {
+              return (
+                '<div class="regex-rule-item">' +
+                '<div class="row">' +
+                '<input type="text" value="' +
+                escapeHtml(rule.pattern) +
+                '" placeholder="模式" data-idx="' +
+                idx +
+                '" data-field="pattern" />' +
+                '<input type="text" value="' +
+                escapeHtml(rule.replacement) +
+                '" placeholder="替换" data-idx="' +
+                idx +
+                '" data-field="replacement" />' +
+                '<input type="text" value="' +
+                escapeHtml(rule.flags || "g") +
+                '" placeholder="标志" data-idx="' +
+                idx +
+                '" data-field="flags" style="width:60px;" />' +
+                '<label><input type="checkbox" ' +
+                (rule.enabled !== false ? "checked" : "") +
+                ' data-idx="' +
+                idx +
+                '" data-field="enabled" /> 启用</label>' +
+                '<button class="btn-small btn-danger" onclick="deleteRegexRule(' +
+                idx +
+                ')">删除</button>' +
+                "</div>" +
+                "</div>"
+              );
+            })
+            .join("");
+          els.regexRulesContainer
+            .querySelectorAll("input[data-field]")
+            .forEach(function (input) {
+              input.addEventListener("change", function () {
+                var idx = parseInt(this.dataset.idx);
+                var field = this.dataset.field;
+                var val = this.type === "checkbox" ? this.checked : this.value;
+                if (state.regexRules[idx]) {
+                  state.regexRules[idx][field] = val;
+                  saveSettings();
+                  if (state.currentChatId) renderCurrentPage(false);
+                }
+              });
+            });
+        }
+
+        window.deleteRegexRule = function (idx) {
+          state.regexRules.splice(idx, 1);
+          saveSettings();
+          renderRegexRules();
+          if (state.currentChatId) renderCurrentPage(false);
+        };
+
+        els.addRegexBtn.addEventListener("click", function () {
+          state.regexRules.push({
+            pattern: "",
+            replacement: "",
+            flags: "g",
+            enabled: true,
+          });
+          saveSettings();
+          renderRegexRules();
+        });
+
+        // ===== 25.5 数据管理 =====
+        function exportSettings() {
+          var data = {
+            bookmarks: state.bookmarks,
+            extractTags: state.extractTags,
+            excludeTags: state.excludeTags,
+            regexRules: state.regexRules,
+            presets: state.presets,
+            activePresetId: state.activePresetId,
+            settings: state.settings,
+          };
+          var blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: "application/json",
+          });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download =
+            "st_reader_settings_" +
+            new Date().toISOString().slice(0, 10) +
+            ".json";
+          a.click();
+          URL.revokeObjectURL(a.href);
+          setStatus("设置已导出", "success");
+        }
+
+        function importSettings(file) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            try {
+              var data = JSON.parse(e.target.result);
+              state.bookmarks = data.bookmarks || [];
+              state.extractTags = data.extractTags || [];
+              state.excludeTags = data.excludeTags || [];
+              state.regexRules = data.regexRules || [];
+              state.presets = data.presets || [];
+              state.activePresetId = data.activePresetId || "default";
+              state.settings = Object.assign({}, state.settings, data.settings);
+              saveSettings();
+              renderTagList(state.extractTags, els.extractTagList);
+              renderTagList(state.excludeTags, els.excludeTagList);
+              renderRegexRules();
+              loadPresets();
+              renderBookmarkList();
+              if (state.currentChatId) renderCurrentPage(false);
+              setStatus("设置已导入", "success");
+            } catch (err) {
+              setStatus("导入失败: " + err.message, "error");
+            }
+          };
+          reader.readAsText(file);
+        }
+
+        els.exportSettingsBtn.addEventListener("click", exportSettings);
+        els.importSettingsBtn.addEventListener("click", function () {
+          els.importSettingsFile.click();
+        });
+        els.importSettingsFile.addEventListener("change", function () {
+          if (this.files[0]) importSettings(this.files[0]);
+          this.value = "";
+        });
+
+        els.clearAllDataBtn.addEventListener("click", function () {
+          if (!confirm("确定清除所有数据？（包括聊天记录、设置、收藏等）"))
+            return;
+          clearAllChatsDB();
+          localStorage.removeItem("st_presets");
+          localStorage.removeItem("st_activePreset");
+          localStorage.removeItem("st_reader_settings_v11");
+          location.reload();
+        });
+
+        // ===== 26. 保存/加载设置 =====
+        function saveSettings() {
+          var data = {
+            bookmarks: state.bookmarks,
+            extractTags: state.extractTags,
+            excludeTags: state.excludeTags,
+            regexRules: state.regexRules,
+            presets: state.presets,
+            activePresetId: state.activePresetId,
+            settings: state.settings,
+          };
+          localStorage.setItem("st_reader_settings_v11", JSON.stringify(data));
+        }
+
+        function loadSettings() {
+          var raw = localStorage.getItem("st_reader_settings_v11");
+          if (raw) {
+            try {
+              var data = JSON.parse(raw);
+              state.bookmarks = data.bookmarks || [];
+              state.extractTags = data.extractTags || [];
+              state.excludeTags = data.excludeTags || [];
+              state.regexRules = data.regexRules || [];
+              state.presets = data.presets || [];
+              state.activePresetId = data.activePresetId || "default";
+              state.settings = Object.assign({}, state.settings, data.settings);
+            } catch (e) {
+              console.error("加载设置失败", e);
+            }
+          }
+          loadPresets();
+          els.extractEnable.checked = state.settings.extractEnabled !== false;
+          renderTagList(state.extractTags, els.extractTagList);
+          renderTagList(state.excludeTags, els.excludeTagList);
+          renderRegexRules();
+          renderBookmarkList();
+          renderScanResults("extract");
+          renderScanResults("exclude");
+        }
+
+        // ===== 27. 滑动翻页 =====
+        var touchStartX = 0,
+          touchStartY = 0,
+          touchStartTime = 0;
+        var contentEl = document.getElementById("content");
+        contentEl.addEventListener(
+          "touchstart",
+          function (e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchStartTime = Date.now();
+          },
+          { passive: true },
+        );
+        contentEl.addEventListener(
+          "touchend",
+          function (e) {
+            var deltaX = e.changedTouches[0].clientX - touchStartX;
+            var deltaY = e.changedTouches[0].clientY - touchStartY;
+            var elapsed = Date.now() - touchStartTime;
+            if (
+              elapsed < 300 &&
+              Math.abs(deltaX) > 50 &&
+              Math.abs(deltaX) > Math.abs(deltaY) * 1.5
+            ) {
+              if (deltaX > 0) changePage(-1);
+              else changePage(1);
+            }
+          },
+          { passive: true },
+        );
+
+        // ===== 28. 初始化 =====
+        function init() {
+          initDB()
+            .then(function () {
+              return loadAllChats();
+            })
+            .then(function (chats) {
+              state.chats = chats;
+              renderChatList();
+              updateCacheStatus();
+              loadSettings();
+              applyStyles();
+              // 设置初始每页条数
+              els.pageSizeInput.value = state.pageSize;
+              var ids = Object.keys(state.chats);
+              if (ids.length > 0) {
+                var lastId = localStorage.getItem("st_lastChatId");
+                var targetId = lastId && state.chats[lastId] ? lastId : ids[0];
+                selectChat(targetId);
+                var lastPage = parseInt(localStorage.getItem("st_lastPage"));
+                if (lastPage && lastPage <= state.pages.length) {
+                  state.currentPage = lastPage;
+                  renderCurrentPage(false);
+                }
+              } else {
+                els.content.innerHTML =
+                  '<div class="welcome-page"><div class="icon">📖</div><h2>欢迎使用酒馆聊天阅读器</h2><p>点击左上角 ☰ 导入聊天记录</p></div>';
+              }
+              window.addEventListener("beforeunload", function () {
+                if (state.currentChatId) {
+                  localStorage.setItem("st_lastChatId", state.currentChatId);
+                  localStorage.setItem("st_lastPage", state.currentPage);
+                }
+              });
+              setStatus("就绪", "success");
+            })
+            .catch(function (e) {
+              console.error("初始化失败", e);
+              setStatus("初始化失败: " + e.message, "error");
+            });
+        }
+
+        // 暴露全局
+        window.selectChat = selectChat;
+        window.deleteChatItem = deleteChatItem;
+        window.toggleBookmark = toggleBookmark;
+        window.jumpToBookmark = jumpToBookmark;
+        window.deleteBookmarkItem = deleteBookmarkItem;
+        window.clearAllChats = clearAllChats;
+        window.addExtractTag = addExtractTag;
+        window.addExcludeTag = addExcludeTag;
+        window.removeTagFromList = removeTagFromList;
+        window.deleteRegexRule = deleteRegexRule;
+
+        init();
+      })();
     </script>
   </body>
 </html>
